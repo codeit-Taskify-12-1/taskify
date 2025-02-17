@@ -48,6 +48,17 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+}
+
+.dropdown{
+  position: absolute;
+  top: -17px;
+  right: -110px;
+}
+
+.profileName{
+  cursor: pointer;
 }
 
 .profileIcon {

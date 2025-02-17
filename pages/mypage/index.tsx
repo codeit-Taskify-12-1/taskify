@@ -9,7 +9,11 @@ import NavBar from "@/src/components/nav/NavBar";
 import SideBar from "@/src/components/sidebar/SideBar";
 import ProfileSettings from "@/src/components/mypage/profilesetting";
 
+
+
 export default function MyPage() {
+  
+
   // useSWR로 사용자 데이터 요청
   const { data: user, error } = useSWR<User>("12-1/users", getUser);
 

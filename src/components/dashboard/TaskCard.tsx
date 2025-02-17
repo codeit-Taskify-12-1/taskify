@@ -2,6 +2,7 @@ import Image from "next/image";
 import styles from "./TaskCard.module.scss";
 import { useState } from "react";
 import TaskCardModal from "../modals/cards/TaskCardModal";
+import React from 'react';
 
 export default function TaskCard({
   card,

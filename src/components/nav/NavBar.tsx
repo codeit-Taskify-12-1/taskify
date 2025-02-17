@@ -156,13 +156,13 @@ export default function NavBar() {
               <span className={styles.profileName}>
                 {userData ? userData.nickname : "로딩중..."}
               </span>
-            </div>
-
+            
             {isDropDownOpen && (
-              <div>
-                <Dropdown />
+              <div className={styles.dropdown}>
+                <Dropdown  />
               </div>
             )}
+            </div>
           </div>
         </div>
       </nav>

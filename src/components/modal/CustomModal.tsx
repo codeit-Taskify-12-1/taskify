@@ -22,7 +22,7 @@ export default function CustomModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className={`${styles.modalOverlay} ${className}`} onClick={onClose}>
+    <div className={`${styles.modalOverlay} ${className}`} onClick={onClose} >
       <div
         className={`${styles.modalContent} ${className}`}
         style={{ width, height }} // 🔹 props로 height 조정 가능

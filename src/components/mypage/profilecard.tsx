@@ -29,7 +29,7 @@ export default function ProfileCard({
     setError(null);
 
     try {
-      await updateProfile({ nickname, profileImage });
+      await updateProfile( nickname, profileImage );
       console.log("프로필 저장 완료", { nickname, profileImage });
       alert("프로필이 업데이트되었습니다!");
       router.push("/mypage"); // 성공 시 마이페이지로 이동

@@ -3,7 +3,10 @@ import NavBar from "@/src/components/nav/NavBar";
 import Board from "@/src/components/dashboard/Board";
 import styles from "./index.module.scss";
 
+
 export default function Page() {
+
+
   return (
     <>
       <SideBar />
