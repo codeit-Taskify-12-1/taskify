@@ -20,8 +20,8 @@ interface Task {
   description: string;
   tags: string[];
   dueDate: string | null;
-  assigneeUserId: number | null; // 수정된 부분
-  columnId: number | null; // 수정된 부분
+  assigneeUserId: number | null;
+  columnId: number | null;
   imageUrl: string | null;
 }
 
@@ -72,7 +72,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
   const [tags, setTags] = useState<string[]>(task.tags || []);
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(task.imageUrl);
-  const [assigneeListState, setAssigneeListState] = useState<Assignee[]>([]); // ✅ useState에 저장할 변수
+  const [assigneeListState, setAssigneeListState] = useState<Assignee[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -87,22 +87,20 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           }
         }
       } catch (error) {
-        console.error("❌ 컬럼 목록 조회 실패:", error);
+        console.error("컬럼 목록 조회 실패:", error);
       }
     };
 
     const fetchAssignees = async () => {
       try {
-        console.log("🟢 현재 dashboardId:", dashboardId);
+        console.log("현재 dashboardId:", dashboardId);
 
         if (!dashboardId || isNaN(Number(dashboardId))) {
-          console.error("❌ 잘못된 dashboardId:", dashboardId);
+          console.error("잘못된 dashboardId:", dashboardId);
           return;
         }
 
         const data = await getMembers(dashboardId);
-        console.log("🟢 getMembers 응답:", data);
-
         if (!Array.isArray(data.members)) {
           console.warn("API 응답에 members 키가 없음. 빈 배열 사용.");
           setAssigneeList([]);
@@ -116,7 +114,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           profileImageUrl: member.profileImageUrl || null,
         }));
 
-        console.log("🟢 변환된 담당자 리스트:", mappedAssignees);
         setAssigneeList(mappedAssignees);
 
         setFormData((prev) => ({
@@ -127,7 +124,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           imageUrl: prev.imageUrl ?? null,
         }));
       } catch (error) {
-        console.error("❌ getMembers API 호출 실패:", error);
+        console.error("getMembers API 호출 실패:", error);
       }
     };
 
@@ -163,8 +160,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
         imageUrl: imageUrl ? imageUrl.trim() : null,
       };
 
-      console.log("📌 최종 업데이트 요청 데이터:", updatedData);
-
       await updateCard(task.id, updatedData);
       await fetchCards();
 
@@ -174,7 +169,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
         onClose();
       }, 100);
     } catch (error) {
-      console.error("❌ 카드 업데이트 중 에러 발생:", error);
+      console.error("카드 업데이트 중 에러 발생:", error);
     }
   };
 
