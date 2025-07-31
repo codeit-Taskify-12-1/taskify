@@ -6,11 +6,11 @@
 }
 
 .uploadLabel {
-  font-weight: 500; // ✅ 제목, 설명, 마감일과 동일한 폰트 스타일
+  font-weight: 500;
   font-size: 18px;
   line-height: 26px;
   color: #333;
-  pointer-events: none; // ✅ 텍스트 클릭 방지
+  pointer-events: none;
 }
 
 .uploadBox {

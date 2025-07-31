@@ -1,10 +1,9 @@
-// src/components/TaskCards/ImageUpload.tsx
 import React, { useRef } from "react";
 import styles from "./TaskImageUpload.module.scss";
 
 interface TaskImageUploadProps {
   imageUrl: string | null;
-  onImageChange: (file: File | null) => void; // 이미지 변경시 호출될 함수
+  onImageChange: (file: File | null) => void;
 }
 
 const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
@@ -26,7 +25,6 @@ const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
 
   return (
     <div className={styles.uploadContainer}>
-      {/* ✅ 제목, 설명과 같은 스타일로 "이미지" 텍스트 수정 */}
       <span className={styles.uploadLabel}>이미지</span>
 
       <div className={styles.uploadBox} onClick={handleClick}>

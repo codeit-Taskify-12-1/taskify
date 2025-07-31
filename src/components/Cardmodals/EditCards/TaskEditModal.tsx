@@ -93,19 +93,19 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
 
     const fetchAssignees = async () => {
       try {
-        console.log("🟢 현재 dashboardId:", dashboardId); // ✅ dashboardId 확인
+        console.log("🟢 현재 dashboardId:", dashboardId);
 
         if (!dashboardId || isNaN(Number(dashboardId))) {
           console.error("❌ 잘못된 dashboardId:", dashboardId);
           return;
         }
 
-        const data = await getMembers(dashboardId); // ✅ getMembers 호출
+        const data = await getMembers(dashboardId);
         console.log("🟢 getMembers 응답:", data);
 
         if (!Array.isArray(data.members)) {
           console.warn("API 응답에 members 키가 없음. 빈 배열 사용.");
-          setAssigneeList([]); // ✅ members가 없을 경우 안전하게 빈 배열 설정
+          setAssigneeList([]);
           return;
         }
 
@@ -190,15 +190,14 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
     }
   };
 
-  if (!isOpen || !task) return null;
-
   useEffect(() => {
+    if (!isOpen || !task) return;
     if (assigneeList.length > 0) {
       setAssigneeListState(assigneeList);
     }
-  }, [assigneeList]);
+  }, [isOpen, task, assigneeList]);
 
-  console.log("🔍 TaskEditModal에서 전달하는 assigneeList:", assigneeListState);
+  if (!isOpen || !task) return null;
 
   return (
     <CustomTaskEditModal
