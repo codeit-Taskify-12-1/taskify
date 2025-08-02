@@ -192,6 +192,24 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
     }
   }, [isOpen, task, assigneeList]);
 
+  // 태그가 변경될 때마다 formData도 업데이트
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: [...tags],
+    }));
+  }, [tags]);
+
+  // 수정 버튼 활성화 조건 체크
+  const isFormValid = () => {
+    return (
+      formData.title.trim() !== "" &&
+      formData.description.trim() !== "" &&
+      formData.columnId !== null &&
+      formData.dueDate !== null
+    );
+  };
+
   if (!isOpen || !task) return null;
 
   return (
@@ -268,7 +286,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           <button onClick={onClose} className={styles.cancelButton}>
             취소
           </button>
-          <button onClick={handleSave} className={styles.saveButton}>
+          <button 
+            onClick={handleSave} 
+            className={styles.saveButton}
+            disabled={!isFormValid()}
+          >
             수정
           </button>
         </div>
