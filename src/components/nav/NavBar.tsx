@@ -123,55 +123,60 @@ export default function NavBar() {
         </div>
         <div className={styles.rightSection}>
           {/* 대시보드 상세 및 수정 페이지에서만 활성화 02.16_혜림 */}
-          {(router.route === `/dashboard/[id]` ||
-            router.route === `/dashboard/[id]/edit`) && (
-            <>
-              <Link href={`/dashboard/${params}/edit`}>
-                <button className={styles.navButton}>
+          {createByMe &&
+            (router.route === `/dashboard/[id]` ||
+              router.route === `/dashboard/[id]/edit`) && (
+              <>
+                {router.route === `/dashboard/[id]` && (
+                  <Link href={`/dashboard/${params}/edit`}>
+                    <button className={styles.navButton}>
+                      <Image
+                        src="/icons/settings.svg"
+                        width={20}
+                        height={20}
+                        alt="설정"
+                      />
+                      관리
+                    </button>
+                  </Link>
+                )}
+                <InviteButton
+                  $nav
+                  dashboardId={params}
+                  setUpdateInvite={setUpdateInvite}
+                >
                   <Image
-                    src="/icons/settings.svg"
+                    src="/icons/add_box.svg"
                     width={20}
                     height={20}
-                    alt="설정"
+                    alt="초대"
                   />
-                  관리
-                </button>
-              </Link>
-              <InviteButton
-                $nav
-                dashboardId={params}
-                setUpdateInvite={setUpdateInvite}
-              >
-                <Image
-                  src="/icons/add_box.svg"
-                  width={20}
-                  height={20}
-                  alt="초대"
-                />
-                <div>초대하기</div>
-              </InviteButton>
-              <div>
-                {members.length > 0 ? (
-                  <div style={{ display: "flex" }}>
-                    {members.map((member: any, index: number) => (
-                      <div className={styles.memberCircle} key={member.id}>
-                        {member.profileImageUrl ? (
-                          <ProfileImage
-                            src={member.profileImageUrl}
-                            alt="프로필"
-                          />
-                        ) : (
-                          <AssigneeCircle>{member?.nickname[0]}</AssigneeCircle>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No members found.</p>
-                )}
-              </div>
-            </>
-          )}
+                  <div>초대하기</div>
+                </InviteButton>
+                <div>
+                  {members.length > 0 ? (
+                    <div style={{ display: "flex" }}>
+                      {members.map((member: any, index: number) => (
+                        <div className={styles.memberCircle} key={member.id}>
+                          {member.profileImageUrl ? (
+                            <ProfileImage
+                              src={member.profileImageUrl}
+                              alt="프로필"
+                            />
+                          ) : (
+                            <AssigneeCircle>
+                              {member?.nickname[0]}
+                            </AssigneeCircle>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No members found.</p>
+                  )}
+                </div>
+              </>
+            )}
           <div className={styles["profile-container"]} ref={dropdownRef}>
             <div className={styles.profile} onClick={toggleDropdown}>
               <span className={styles.profileIcon}>

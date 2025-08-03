@@ -10,7 +10,7 @@ import axiosInstance from "../../../api/axios";
 import { useEditPagination } from "../../../hooks/dashboard/edit/useEditPagination";
 
 const EditContext = createContext({
-  isBebridge: null,
+  isDashboard: null,
   isMembers: null,
   isInvitations: null,
   memberPage: 1,
@@ -32,7 +32,7 @@ export function EditProvider({
   dashboardId: string;
 }) {
   const [values, setValues] = useState({
-    isBebridge: null,
+    isDashboard: null,
     isMembers: null,
     isInvitations: null,
   });
@@ -55,11 +55,11 @@ export function EditProvider({
 
   async function getDashboardDetail() {
     const res = await axiosInstance.get(`/dashboards/${dashboardId}`);
-    const bebridge = res.data;
+    const dashboard = res.data;
 
     setValues((prevValues) => ({
       ...prevValues,
-      isBebridge: bebridge,
+      isDashboard: dashboard,
     }));
   }
 
@@ -98,7 +98,7 @@ export function EditProvider({
   return (
     <EditContext.Provider
       value={{
-        isBebridge: values.isBebridge,
+        isDashboard: values.isDashboard,
         isMembers: values.isMembers,
         isInvitations: values.isInvitations,
         memberPage,

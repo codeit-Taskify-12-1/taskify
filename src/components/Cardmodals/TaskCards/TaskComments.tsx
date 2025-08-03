@@ -1,20 +1,25 @@
 import { useEffect, useState, useRef } from "react";
 import { getComments, deleteComment, updateComment } from "@/src/api/comments";
 import styled from "styled-components";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/ko";
 
+dayjs.extend(relativeTime);
+dayjs.locale("ko");
 
 interface TaskCommentsProps {
   cardId: number;
   comments: any[];
   setComments: React.Dispatch<React.SetStateAction<any[]>>;
-  onOpenEditModal?: () => void;
+  handleOpenEditModal?: () => void;
 }
 
 const TaskComments: React.FC<TaskCommentsProps> = ({
   cardId,
   comments,
   setComments,
-  onOpenEditModal,
+  handleOpenEditModal,
 }) => {
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,10 +29,46 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
+  const [scrollInfo, setScrollInfo] = useState({ isAtBottom: false, scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
+  
+  // 클라이언트 사이드 페이지네이션을 위한 상태
+  const [allComments, setAllComments] = useState<any[]>([]);
+  const [displayedComments, setDisplayedComments] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 3;
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+    
+    setScrollInfo({
+      isAtBottom,
+      scrollTop,
+      scrollHeight,
+      clientHeight
+    });
+    
+    console.log("스크롤 정보:", { isAtBottom, scrollTop, scrollHeight, clientHeight });
+  };
 
   useEffect(() => {
-    if (cardId) fetchComments(true);
-  }, []);
+    if (cardId) {
+      console.log("카드 변경됨, 상태 초기화:", cardId);
+      // 모달 재접속 시 상태 초기화
+      setComments([]);
+      setAllComments([]);
+      setDisplayedComments([]);
+      setCurrentPage(1);
+      setCursorId(null);
+      setHasMore(true);
+      setLoading(false);
+      
+      // 약간의 지연 후 초기 댓글 로드
+      setTimeout(() => {
+        fetchComments(true);
+      }, 100);
+    }
+  }, [cardId]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,34 +88,85 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   }, [openDropdownId]);
 
   useEffect(() => {
-    if (!loading && hasMore && comments.length > 0) {
+    // 기존 observer 정리
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+
+    // 새로운 observer 설정
+    if (hasMore && !loading && displayedComments.length > 0) {
       const trigger = document.getElementById("scroll-trigger");
       if (trigger) {
-        observer.current = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting) {
-            fetchComments();
+        console.log("스크롤 트리거 설정됨");
+        observer.current = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting && hasMore && !loading) {
+              console.log("스크롤 트리거 감지됨, 추가 댓글 로드");
+              fetchComments(false);
+            }
+          },
+          {
+            root: null,
+            rootMargin: "50px",
+            threshold: 0.1,
           }
-        });
+        );
         observer.current.observe(trigger);
       }
     }
-    return () => observer.current?.disconnect();
-  }, [comments]);
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [hasMore, loading, displayedComments.length]);
 
   const fetchComments = async (reset = false) => {
-    if (!cardId || loading || (!reset && !hasMore)) return;
+    if (!cardId || loading) {
+      console.log("fetchComments 조건 불충족:", { cardId, loading });
+      return;
+    }
+    
+    console.log("fetchComments 시작:", { reset });
     setLoading(true);
+    
     try {
-      const response = await getComments(cardId, 2, reset ? null : cursorId);
-      if (response) {
-        setComments((prev) =>
-          reset ? response.comments : [...prev, ...response.comments]
-        );
-        setCursorId(response.nextCursor || null);
-        setHasMore(response.hasMore);
+      // 모든 댓글을 한번에 가져오기 (size를 충분히 크게 설정)
+      const response = await getComments(cardId, 100, null);
+      console.log("API 응답:", response);
+      
+      if (response && response.comments) {
+        if (reset) {
+          // 초기 로딩: 모든 댓글 저장하고 첫 3개만 표시
+          setAllComments(response.comments);
+          setDisplayedComments(response.comments.slice(0, commentsPerPage));
+          setCurrentPage(1);
+          setHasMore(response.comments.length > commentsPerPage);
+          console.log("초기 로딩:", { 
+            totalComments: response.comments.length, 
+            displayedComments: response.comments.slice(0, commentsPerPage).length 
+          });
+        } else {
+          // 추가 로딩: 다음 3개 추가
+          const nextPage = currentPage + 1;
+          const startIndex = (nextPage - 1) * commentsPerPage;
+          const endIndex = startIndex + commentsPerPage;
+          const newComments = response.comments.slice(startIndex, endIndex);
+          
+          setDisplayedComments(prev => [...prev, ...newComments]);
+          setCurrentPage(nextPage);
+          setHasMore(endIndex < response.comments.length);
+          
+          console.log("추가 로딩:", { 
+            page: nextPage, 
+            newComments: newComments.length,
+            totalDisplayed: displayedComments.length + newComments.length
+          });
+        }
       }
     } catch (error) {
-      console.error("❌ 댓글 조회 실패:", error);
+      console.error("댓글 조회 실패:", error);
     }
     setLoading(false);
   };
@@ -82,6 +174,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   const handleEditClick = (comment: any) => {
     setEditingCommentId(comment.id);
     setEditContent(comment.content);
+    handleOpenEditModal?.();
   };
 
   const handleUpdateComment = async (commentId: number) => {
@@ -97,7 +190,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
       );
       setEditingCommentId(null);
     } catch (error) {
-      console.error("❌ 댓글 수정 실패:", error);
+      console.error("댓글 수정 실패:", error);
     }
   };
 
@@ -106,79 +199,92 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
       await deleteComment(commentId);
       setComments((prev) => prev.filter((comment) => comment.id !== commentId));
     } catch (error) {
-      console.error("❌ 댓글 삭제 실패:", error);
+      console.error("댓글 삭제 실패:", error);
     }
   };
 
   return (
     <CommentListWrapper>
-      <CommentList>
-        {comments.map((comment) => (
-          <TaskCommentItem key={comment.id}>
-            <ProfileImage src={comment.author.profileImageUrl} alt="프로필" />
-            <CommentContentWrapper>
-              <CommentHeader>
-                <CommentMeta>
-                  <CommentAuthor>{comment.author.nickname}</CommentAuthor>
-                  <CommentTime>
-                    {new Date(comment.createdAt).toLocaleString("ko-KR", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </CommentTime>
-                </CommentMeta>
-                <DropdownContainer>
-                  <DropdownIcon
-                    src="/icons/kebab.svg"
-                    alt="메뉴"
-                    onClick={() =>
-                      setOpenDropdownId(
-                        openDropdownId === comment.id ? null : comment.id
-                      )
-                    }
-                  />
-                  {openDropdownId === comment.id && (
-                    <DropdownMenu ref={dropdownRef}>
-                      {editingCommentId === comment.id ? (
+      <CommentListContainer
+        onScroll={handleScroll}
+      >
+        <CommentList>
+          {displayedComments.map((comment) => (
+            <TaskCommentItem key={comment.id}>
+              <ProfileImage src={comment.author.profileImageUrl} alt="프로필" />
+              <CommentContentWrapper>
+                <CommentHeader>
+                  <CommentMeta>
+                    <CommentAuthor>{comment.author.nickname}</CommentAuthor>
+                    <CommentTime>
+                      {dayjs(comment.createdAt).format("YYYY.MM.DD HH:mm")}
+                    </CommentTime>
+                  </CommentMeta>
+                  <DropdownContainer>
+                    <DropdownIcon
+                      src="/icons/kebab.svg"
+                      alt="메뉴"
+                      width={16}
+                      height={16}
+                      onClick={() =>
+                        setOpenDropdownId(
+                          openDropdownId === comment.id ? null : comment.id
+                        )
+                      }
+                    />
+                    {openDropdownId === comment.id && (
+                      <DropdownMenu ref={dropdownRef}>
+                        {editingCommentId === comment.id ? (
+                          <DropdownItem
+                            onClick={() => handleUpdateComment(comment.id)}
+                          >
+                            저장
+                          </DropdownItem>
+                        ) : (
+                          <DropdownItem onClick={() => handleEditClick(comment)}>
+                            수정
+                          </DropdownItem>
+                        )}
                         <DropdownItem
-                          onClick={() => handleUpdateComment(comment.id)}
+                          onClick={() => handleDeleteClick(comment.id)}
                         >
-                          저장
+                          삭제
                         </DropdownItem>
-                      ) : (
-                        <DropdownItem onClick={() => handleEditClick(comment)}>
-                          수정
-                        </DropdownItem>
-                      )}
-                      <DropdownItem
-                        onClick={() => handleDeleteClick(comment.id)}
-                      >
-                        삭제
-                      </DropdownItem>
-                    </DropdownMenu>
-                  )}
-                </DropdownContainer>
-              </CommentHeader>
-              {editingCommentId === comment.id ? (
-                <EditInput
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  onBlur={() => handleUpdateComment(comment.id)}
-                />
-              ) : (
-                <TaskCommentText>{comment.content}</TaskCommentText>
-              )}
-            </CommentContentWrapper>
-          </TaskCommentItem>
-        ))}
-        <div
-          id="scroll-trigger"
-          style={{ height: "10px", visibility: "hidden" }}
-        />
-      </CommentList>
+                      </DropdownMenu>
+                    )}
+                  </DropdownContainer>
+                </CommentHeader>
+                {editingCommentId === comment.id ? (
+                  <EditInput
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    onBlur={() => handleUpdateComment(comment.id)}
+                  />
+                ) : (
+                  <TaskCommentText>{comment.content}</TaskCommentText>
+                )}
+              </CommentContentWrapper>
+            </TaskCommentItem>
+          ))}
+          {hasMore && (
+            <div
+              id="scroll-trigger"
+              style={{ 
+                height: "40px", 
+                display: "flex", 
+                justifyContent: "center", 
+                alignItems: "center",
+                padding: "8px",
+                margin: "8px 0",
+                color: "#999",
+                fontSize: "12px"
+              }}
+            >
+              {loading ? "로딩 중..." : "더 보기"}
+            </div>
+          )}
+        </CommentList>
+      </CommentListContainer>
     </CommentListWrapper>
   );
 };
@@ -205,14 +311,45 @@ const CommentListWrapper = styled.div`
   flex-direction: column;
 `;
 
-const CommentList = styled.ul`
+const CommentListContainer = styled.div`
+  height: 300px;
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 0;
+  margin: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+  }
+`;
+
+const CommentList = styled.ul`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 `;
 
 const TaskCommentItem = styled.li`

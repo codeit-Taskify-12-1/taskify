@@ -36,7 +36,7 @@ export const CheckModal = ({
             {(member || invite || dashboard) && (
               <Button onClick={closeModal}>닫기</Button>
             )}
-         <Button
+            <Button
               $confirm
               onClick={() => {
                 closeModal();
@@ -50,9 +50,7 @@ export const CheckModal = ({
                   deleteDashboard?.();
                 }
               }}
-            > 
-
-
+            >
               {member || dashboard
                 ? "삭제하기"
                 : invite

@@ -16,10 +16,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user }) => {
 
   const router = useRouter();
 
-  const [nickname, setNickname] = useState("");
-
-  const [error, setError] = useState<string | null>(null);
-
   return (
     <div className={styles.global}>
       <div className={styles.profileSettings}>
@@ -28,10 +24,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user }) => {
         </button>
 
         <ProfileCard
-          nickname={nickname}
           recentNickname={recentNickname}
           email={user.email}
-          setNickname={setNickname}
           recentProfileImg={recentProfileImg}
         />
 

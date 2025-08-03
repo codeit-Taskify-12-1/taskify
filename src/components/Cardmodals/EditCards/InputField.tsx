@@ -1,14 +1,14 @@
 import React from "react";
+import styles from "./InputField.module.scss";
 
 interface InputFieldProps {
   label: string;
   name: string;
   type: string;
   value: string;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
+  className?: string;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -18,18 +18,13 @@ const InputField: React.FC<InputFieldProps> = ({
   value,
   onChange,
   required,
+  className,
 }) => {
   return (
-    <div>
-      <label>{label}</label>
-      {type === "textarea" ? (
-        <textarea
-          name={name}
-          value={value}
-          onChange={onChange}
-          required={required}
-        />
-      ) : (
+    <div className={`${styles.inputField} ${className || ""}`}>
+      <label className={styles.label}>{label}</label>
+      <div className={styles.inputWrapper}>
+        {" "}
         <input
           type={type}
           name={name}
@@ -37,7 +32,7 @@ const InputField: React.FC<InputFieldProps> = ({
           onChange={onChange}
           required={required}
         />
-      )}
+      </div>
     </div>
   );
 };

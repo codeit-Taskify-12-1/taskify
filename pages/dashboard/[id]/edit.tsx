@@ -5,12 +5,11 @@ import styles from "../index.module.scss";
 import NavBar from "@/src/components/nav/NavBar";
 import SideBar from "@/src/components/sidebar/SideBar";
 import BackLocation from "@/src/components/dashboard/edit/BackLocation";
-import BebridgeContainer from "@/src/components/dashboard/edit/BebridgeContainer";
+import DashboardContainer from "@/src/components/dashboard/edit/DashboardContainer";
 import DeleteContainer from "@/src/components/dashboard/edit/DeleteContainer";
 import InvitationContainer from "@/src/components/dashboard/edit/InvitationContainer";
 import MemberContainer from "@/src/components/dashboard/edit/MemberContainer";
 import { EditProvider } from "@/src/contexts/dashboard/edit/EditDashboardProvider";
-
 
 const Container = styled.div`
   width: calc(100vw * 375 / 1200);
@@ -23,7 +22,6 @@ const Container = styled.div`
 `;
 
 export default function EditPage() {
-
   const router = useRouter();
   const dashboardId = router.query.id as string;
 
@@ -39,7 +37,7 @@ export default function EditPage() {
           <div className={styles.content}>
             <Container>
               <BackLocation />
-              <BebridgeContainer dashboardId={dashboardId} />
+              <DashboardContainer dashboardId={dashboardId} />
               <MemberContainer />
               <InvitationContainer dashboardId={dashboardId} />
               <DeleteContainer dashboardId={dashboardId} />

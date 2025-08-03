@@ -1,10 +1,19 @@
+import { AxiosResponse } from "axios";
 import axiosInstance from "./axios";
+
+interface Column {
+  id: number;
+  title: string;
+}
 
 export const getColumns = async (dashboardId: number) => {
   try {
-    const response = await axiosInstance.get(`/columns`, {
-      params: { dashboardId },
-    });
+    const response = await axiosInstance.get<AxiosResponse<Column[]>>(
+      `/columns`,
+      {
+        params: { dashboardId },
+      }
+    );
 
     return response.data.data;
   } catch (error: any) {

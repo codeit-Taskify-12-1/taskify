@@ -5,7 +5,7 @@ import styles from "@/pages/mypage/mypage.module.scss";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface AvatarUploaderProps {
-  setReqImage: React.Dispatch<SetStateAction<File | string>>;
+  setReqImage: React.Dispatch<SetStateAction<File | null | undefined>>;
   isThumbnail: string | StaticImport | null;
   setIsThumbnail: React.Dispatch<SetStateAction<string | StaticImport | null>>;
 }

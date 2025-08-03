@@ -26,7 +26,7 @@ export function MemberList({
           <ul className={styles.memberList}>
             {isMembersData &&
               isMembersData?.map((item) => {
-                const { id, email, profileImageUrl } = item;
+                const { id, email, profileImageUrl, isOwner } = item;
                 return (
                   <li key={id} className={styles.tile}>
                     <div className={styles.profileCover}>
@@ -42,11 +42,23 @@ export function MemberList({
                           email[0]
                         )}
                       </div>
-                      <p className={styles.nickname}>{item.nickname}</p>
+                      <div className={styles.nickname}>
+                        <p>{item.nickname}</p>
+                        {isOwner && (
+                          <Image
+                            src="/icons/crown.svg"
+                            width={20}
+                            height={20}
+                            alt="초대"
+                          />
+                        )}
+                      </div>
                     </div>
-                    <Button onClick={() => handleShowModal(id)} $sub>
-                      삭제
-                    </Button>
+                    {!isOwner && (
+                      <Button onClick={() => handleShowModal(id)} $sub>
+                        삭제
+                      </Button>
+                    )}
                   </li>
                 );
               })}

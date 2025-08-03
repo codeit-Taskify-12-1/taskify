@@ -22,7 +22,7 @@ const TaskCommentInput: React.FC<TaskCommentInputProps> = ({
   const handleAddComment = async () => {
     const trimmedComment = newComment.trim();
     if (!trimmedComment) {
-      console.error("❌ 댓글이 비어있음. API 요청 취소");
+      console.error("댓글이 비어있음. API 요청 취소");
       return;
     }
 
@@ -34,13 +34,19 @@ const TaskCommentInput: React.FC<TaskCommentInputProps> = ({
         dashboardId
       );
 
-      setNewComment(""); // 입력창 초기화
+      // 현재 시간을 추가하여 시간 표시 문제 해결
+      const commentWithCurrentTime = {
+        ...newCommentData,
+        createdAt: new Date().toISOString(),
+      };
 
-      setComments((prevComments) => [newCommentData, ...prevComments]);
+      setNewComment("");
+
+      setComments((prevComments) => [commentWithCurrentTime, ...prevComments]);
 
       await onCommentAdded();
     } catch (error) {
-      console.error("❌ 댓글 추가 실패:", error);
+      console.error("댓글 추가 실패:", error);
     }
   };
 
@@ -63,11 +69,10 @@ const TaskCommentInput: React.FC<TaskCommentInputProps> = ({
 
 export default TaskCommentInput;
 
-// ✅ 스타일 유지
 const CommentInputContainer = styled.div`
   position: relative;
 
-  height: 110px; /* 높이 추가 조정 */
+  height: 110px;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   background: #ffffff;
@@ -88,19 +93,19 @@ const CommentInput = styled.textarea`
   position: absolute;
   top: 16px;
   left: 16px;
-  width: calc(100% - 115px); /* 입력 버튼이 시작하기 전까지 */
-  height: calc(100% - 32px); /* 높이를 상단-하단 간격 동일하게 조정 */
+  width: calc(100% - 115px);
+  height: calc(100% - 32px);
   border: none;
   outline: none;
   font-size: 14px;
   font-weight: 400;
-  color: #333236; /* 댓글 작성 시 글자 색상 변경 */
+  color: #333236;
   background: transparent;
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
   overflow-y: auto;
-  resize: none; /* 크기 조절 기능 제거 */
+  resize: none;
 `;
 
 const SubmitButton = styled.button`

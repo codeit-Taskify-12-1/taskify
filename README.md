@@ -1,84 +1,65 @@
-# taskify<div style="text-align: center;">
+# 🚀 Taskify
 
+![Image](https://github.com/user-attachments/assets/e1fe9360-3f6f-473a-bbfa-f46eca1961c7)
 - 스스로 채우는 일정 관리 서비스
 - 개발 기간 : 25.02.03(월) ~ 25.02.19(수)
 
-# Team
 
-## 장보배 👑
+## 🎯 프로젝트 소개
 
-- 팀장
+![Image](https://github.com/user-attachments/assets/fbc4e158-86e4-43e4-bedf-995b4a2c7e07)
 
-## 박나겸
+**Taskify**는 칸반보드 단위로 팀 일정을 관리할 수 있는 실용적인 서비스입니다. 
+이 프로젝트를 통해 실제 사용 가능한 웹 애플리케이션을 구축하는 경험을 쌓았습니다.
 
-## 윤혜림
+## ✨ 주요 기능
+- ✅ 칸반보드를 활용한 직관적인 태스크 관리
+- ✅ 팀원 간 실시간 협업 가능
+- ✅ 사용자 친화적인 UI/UX
 
-## 추예원
 
-## 전병진
 
-# Images
+## 🛠 기술 스택
 
-# Skill Stacks
+<img alt="React" src ="https://img.shields.io/badge/React-61DAFB.svg?&style=for-the-badge&logo=React&logoColor=white"/> <img alt="Next.js" src ="https://img.shields.io/badge/Next.js-000000.svg?&style=for-the-badge&logo=Next.js&logoColor=white"/> <img alt="TypeScript" src ="https://img.shields.io/badge/TypeScript-3178C6.svg?&style=for-the-badge&logo=TypeScript&logoColor=white"/> <img alt="SCSS" src ="https://img.shields.io/badge/SCSS-CC6699.svg?&style=for-the-badge&logo=Sass&logoColor=white"/> <img alt="Axios" src ="https://img.shields.io/badge/Axios-5A29E4.svg?&style=for-the-badge&logo=Axios&logoColor=white"/> <img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> <img alt="Vercel" src ="https://img.shields.io/badge/Vercel-000000.svg?&style=for-the-badge&logo=Vercel&logoColor=white"/> <img alt="Lucide" src ="https://img.shields.io/badge/Lucide-FF5733.svg?&style=for-the-badge&logo=Lucide&logoColor=white"/> <img alt="AOS" src ="https://img.shields.io/badge/AOS-000000.svg?&style=for-the-badge&logo=AOS&logoColor=white"/>
 
-## Environment
+## 📂 파일 구조
+![Image](https://github.com/user-attachments/assets/357fe242-b038-4a5d-b6a3-10d98a7d5c15)
 
-<img alt="Git" src ="https://img.shields.io/badge/Git-f05032.svg?&style=for-the-badge&logo=Git&logoColor=white"/> <img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> <img alt="VSCode" src ="https://img.shields.io/badge/VSCode-007acc.svg?&style=for-the-badge&logo=visualstudiocode&logoColor=white"/> <img alt="Vercel" src ="https://img.shields.io/badge/Vercel-000000.svg?&style=for-the-badge&logo=Vercel&logoColor=white"/> <img alt="Figma" src ="https://img.shields.io/badge/Figma-f24e1e.svg?&style=for-the-badge&logo=Figma&logoColor=white"/>
+## 🎬 시연 영상
+![Image](https://github.com/user-attachments/assets/cd5f1624-b0cb-44eb-aad5-384a13e47fac)
 
-## Development
+![Image](https://github.com/user-attachments/assets/5791c62d-9c19-452c-96aa-6139995391de)
 
-<img alt="TypeScript" src ="https://img.shields.io/badge/TypeScript-3178C6.svg?&style=for-the-badge&logo=TypeScript&logoColor=white"/> <img alt="Next.js" src ="https://img.shields.io/badge/Next.js-000000.svg?&style=for-the-badge&logo=Next.js&logoColor=white"/>
+![Image](https://github.com/user-attachments/assets/0457fdc1-c11a-459c-9247-8852364ec8fb)
 
-## Libraries
+![Image](https://github.com/user-attachments/assets/19370f26-a029-4039-a06a-39ef8590ed25)
 
-<a href="https://axios-http.com/kr/"><img alt="Axios" src ="https://img.shields.io/badge/Axios-5429e4.svg?&logo=Axios&logoColor=white&style=for-the-badge"/></a><br/>
-<img alt="next-themes" src ="https://img.shields.io/badge/next_themes-000.svg?&style=for-the-badge"/> : DarkMode 구성에 필요 간편한 테마 관리<br/>
-<img alt="react-datetime" src ="https://img.shields.io/badge/react_datetime-61DAFB.svg?&style=for-the-badge"/> : datetime-loacal 인풋의 스타일 조정 및 포매팅<br/>
-<img alt="react-responsive" src ="https://img.shields.io/badge/react_responsive-61DAFB.svg?&style=for-the-badge"/> : 반응형(미디어 쿼리) 관리<br/>
+![Image](https://github.com/user-attachments/assets/8d27cd63-1796-4c76-889e-b457e6ad8c3f)
 
-# Package Structure
+## 👨‍💻 팀원 소개
 
-```
-taskify
-├─ pages                    # 페이지
-├─ public
-│  ├─ icons                 # 아이콘 리소스
-│  └─ images                # 이미지 리소스
-├─ src
-│  ├─ api                   # API 사용을 위한 세팅
-│  ├─ components            # 주요 컴포넌트
-│  ├─ constants             # 페이지 설정
-│  ├─ contexts              # 인증, 모달 컨텍스트 프로바이더
-│  ├─ hooks                 # 커스텀 훅
-│  ├─ types                 # 주요 Json 타입
-│  └─ util                  # 기타 유틸리티
-├─ static
-│  └─ fonts                 # 폰트
-└─ styles                   # 스타일
-```
+- **박나겸**  
+  *대시보드 페이지, 대시보드 상세페이지, Nav바, Side바, 프로젝트 발표*
 
-# Installation
+- **윤혜림**  
+  *대시보드 수정페이지, 대시보드 초대하기, 마이페이지*
 
-1. Clone the repository
+- **장보배 (팀장)👑**  
+  *회원가입, 로그인페이지, 랜딩페이지 애니메이션, 마이페이지 비밀번호 변경, 프로필 이미지 삭제*
 
+- **전병진**  
+  *커스텀 모달창 컴포넌트, 상세 카드 모달, 수정 카드 모달, 태그 공용 컴포넌트*
+
+## 🚀 프로젝트 실행 방법
 ```bash
+# 프로젝트 클론
 git clone https://github.com/codeit-Taskify-12-1/taskify.git
-```
+cd taskify
 
-2. Install dependencies
-
-```bash
+# 패키지 설치
 npm install
-```
 
-3. Start the development server
-
-```bash
-npm start dev
-```
-
-4. Open the project in your browser
-
-```bash
-http://localhost:3000
+# 개발 서버 실행
+npm run dev
 ```

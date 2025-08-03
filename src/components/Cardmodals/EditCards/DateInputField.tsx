@@ -1,6 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import styles from "./DateInputField.module.scss";
 
 interface DateInputFieldProps {
   label: string;
@@ -14,15 +15,25 @@ const DateInputField: React.FC<DateInputFieldProps> = ({
   onDateChange,
 }) => {
   return (
-    <div>
-      <label>{label}</label>
-      <DatePicker
-        selected={selectedDate}
-        onChange={onDateChange}
-        showTimeSelect
-        timeFormat="HH:mm"
-        dateFormat="yyyy.MM.dd HH:mm"
-      />
+    <div className={styles.dateInputField}>
+      <label className={styles.label}>{label}</label>
+      <div className={styles.datePickerWrapper}>
+        <img
+          src="/icons/calendar.svg"
+          alt="캘린더 아이콘"
+          width={16}
+          height={18}
+          className={styles.calendarIcon}
+        />
+        <DatePicker
+          selected={selectedDate}
+          onChange={onDateChange}
+          showTimeSelect
+          timeFormat="HH:mm"
+          dateFormat="yyyy.MM.dd HH:mm"
+          className={styles.reactDatePickerInput}
+        />
+      </div>
     </div>
   );
 };

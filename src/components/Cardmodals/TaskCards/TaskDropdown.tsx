@@ -19,7 +19,7 @@ const TaskDropdown: React.FC<TaskDropdownProps> = ({
     try {
       await axiosInstance.delete(`/cards/${cardId}`);
       alert("카드가 삭제되었습니다.");
-      window.location.reload(); // 삭제 후 새로고침
+      window.location.reload();
     } catch (error) {
       console.error("카드 삭제 실패:", error);
     }
@@ -29,10 +29,10 @@ const TaskDropdown: React.FC<TaskDropdownProps> = ({
     <DropdownContainer>
       <ButtonGroup>
         <IconButton onClick={() => setDropdownOpen(!dropdownOpen)}>
-          <Image src="/icons/kebab.svg" alt="메뉴" />
+          <Image src="/icons/kebab.svg" alt="메뉴" width={28} height={28} />
         </IconButton>
         <IconButton onClick={onClose}>
-          <Image src="/icons/close.svg" alt="닫기" />
+          <Image src="/icons/close.svg" alt="닫기" width={28} height={28} />
         </IconButton>
       </ButtonGroup>
       {dropdownOpen && (

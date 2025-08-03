@@ -3,33 +3,31 @@ import styled from "styled-components";
 
 interface TaskTagsProps {
   tags: string[];
-
 }
 
 const TAG_COLORS: { [key: string]: string } = {
-  "#F9EEE3": "#FFA500", // 주황색 배경 → 주황색 텍스트
-  "#E7F7DB": "#7AC555", // 연두색 배경 → 녹색 텍스트
-  "#F7DBF0": "#E876EA", // 핑크 배경 → 핑크 텍스트
-  "#DBE6F7": "#76A5EA", // 파란 배경 → 파란 텍스트
+  "#F9EEE3": "#FFA500",
+  "#E7F7DB": "#7AC555",
+  "#F7DBF0": "#E876EA",
+  "#DBE6F7": "#76A5EA",
 };
 
-// 태그 이름을 기반으로 색상 매핑을 캐싱하여 랜덤성을 유지
 const getTagColor = (() => {
-  const tagColorMap = new Map<string, string>(); // 태그별 색상 저장
+  const tagColorMap = new Map<string, string>();
   const availableColors = Object.keys(TAG_COLORS);
 
   return (tag: string) => {
     if (!tagColorMap.has(tag)) {
       const randomColor =
-        availableColors[tagColorMap.size % availableColors.length]; // 랜덤 색상 할당 (순환)
+        availableColors[tagColorMap.size % availableColors.length];
       tagColorMap.set(tag, randomColor);
     }
     return tagColorMap.get(tag) || "#ddd";
   };
 })();
 
-const TaskTags: React.FC<TaskTagsProps> = ({ tags })=> {
-  const uniqueTags = useMemo(() => [...new Set(tags)], [tags]); // 중복 태그 제거
+const TaskTags: React.FC<TaskTagsProps> = ({ tags }) => {
+  const uniqueTags = useMemo(() => [...new Set(tags)], [tags]);
 
   return (
     <TagsContainer>
@@ -40,7 +38,6 @@ const TaskTags: React.FC<TaskTagsProps> = ({ tags })=> {
         return (
           <Tag key={tag} bgColor={bgColor} textColor={textColor}>
             {tag}
-
           </Tag>
         );
       })}

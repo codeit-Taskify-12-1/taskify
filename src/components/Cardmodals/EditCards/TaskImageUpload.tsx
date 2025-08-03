@@ -1,32 +1,51 @@
-// src/components/TaskCards/ImageUpload.tsx
-import React from "react";
+import React, { useRef } from "react";
+import styles from "./TaskImageUpload.module.scss";
 
 interface TaskImageUploadProps {
   imageUrl: string | null;
-  onImageChange: (file: File | null) => void; // 이미지 변경시 호출될 함수
+  onImageChange: (file: File | null) => void;
 }
 
 const TaskImageUpload: React.FC<TaskImageUploadProps> = ({
   imageUrl,
   onImageChange,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
-    onImageChange(file); // 부모 컴포넌트에 전달
+    onImageChange(file);
+  };
+
+  const handleClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
-    <div>
-      <label>이미지 업로드</label>
-      <input type="file" onChange={handleImageChange} />
-      {imageUrl && (
-        <img
-          src={imageUrl}
-          alt="Image Preview"
-          style={{ width: "100px", height: "100px" }}
-        />
-      )}{" "}
-      {/* 이미지 미리보기 */}
+    <div className={styles.uploadContainer}>
+      <span className={styles.uploadLabel}>이미지</span>
+
+      <div className={styles.uploadBox} onClick={handleClick}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Uploaded preview"
+            className={styles.uploadPreview}
+          />
+        ) : (
+          <span className={styles.uploadIcon}>+</span>
+        )}
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        ref={fileInputRef}
+        className={styles.hiddenInput}
+      />
     </div>
   );
 };

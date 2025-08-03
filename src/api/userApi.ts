@@ -28,10 +28,7 @@ export const getUser = async (): Promise<User> => {
 };
 
 // 사용자 프로필 수정 API 함수
-export const updateProfile = async (
-  nickname: string,
-  profileImage?: File
-) => {
+export const updateProfile = async (nickname: string, profileImage?: File) => {
   try {
     const accessToken = sessionStorage.getItem("accessToken");
 
@@ -43,7 +40,7 @@ export const updateProfile = async (
 
     const formData = new FormData();
     formData.append("nickname", nickname);
-    if (profileImage) {
+    if (profileImage !== undefined || profileImage) {
       formData.append("profileImageUrl", profileImage);
     }
 
@@ -57,7 +54,5 @@ export const updateProfile = async (
     return response.data;
   } catch (error) {
     console.error("프로필 업데이트 실패:", error);
-    throw error;
   }
 };
-

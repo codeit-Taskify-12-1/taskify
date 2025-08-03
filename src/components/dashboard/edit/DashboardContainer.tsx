@@ -20,7 +20,7 @@ const ColorTile = styled.li`
   cursor: pointer;
 `;
 
-export default function BebridgeContainer({
+export default function DashboardContainer({
   dashboardId,
 }: {
   dashboardId: string;
@@ -32,10 +32,10 @@ export default function BebridgeContainer({
   const isMessage = "변경이 완료 되었습니다.";
   const [isUpdate, setIsUpdate] = useState();
 
-  const { isBebridge, getDashboardDetail } = useEdit();
+  const { isDashboard, getDashboardDetail } = useEdit();
 
   const { title: isTitle, color: isColor }: { title?: string; color?: string } =
-    isBebridge ?? {};
+    isDashboard ?? {};
 
   // 대시보드 이름 value 저장
   const handleUpdateTitle = (e: ChangeEvent<HTMLInputElement>) => {
@@ -67,18 +67,18 @@ export default function BebridgeContainer({
 
   // 데이터 수정 후 업데이트
   useEffect(() => {
-    if (isBebridge) getDashboardDetail();
+    if (isDashboard) getDashboardDetail();
   }, [isUpdate]);
 
   // 렌더링 시 데이터 화면 출력
   useEffect(() => {
-    if (isBebridge) {
-      const { title, color }: { title: string; color: string } = isBebridge;
+    if (isDashboard) {
+      const { title, color }: { title: string; color: string } = isDashboard;
       const isColor = color.toLowerCase();
       setIsUpdateTitle(title);
       setIsUpdateColor(isColor);
     }
-  }, [isBebridge]);
+  }, [isDashboard]);
 
   // 조건에 따라 변경 버튼 활성화/비활성화
   useMemo(() => {
@@ -106,7 +106,7 @@ export default function BebridgeContainer({
       )}
       <div className={`${styles.container} ${styles.section1}`}>
         <div className={styles.head}>
-          <p className={styles.title}>비브리지</p>
+          <p className={styles.title}>{isTitle}</p>
         </div>
         <div className={styles.contents}>
           <p className={styles.title}>대시보드 이름</p>
