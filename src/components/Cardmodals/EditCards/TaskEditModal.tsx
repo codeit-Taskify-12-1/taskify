@@ -206,7 +206,8 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
       formData.title.trim() !== "" &&
       formData.description.trim() !== "" &&
       formData.columnId !== null &&
-      formData.dueDate !== null
+      formData.dueDate !== null &&
+      tags.length > 0
     );
   };
 

@@ -34,9 +34,15 @@ const TaskCommentInput: React.FC<TaskCommentInputProps> = ({
         dashboardId
       );
 
+      // 현재 시간을 추가하여 시간 표시 문제 해결
+      const commentWithCurrentTime = {
+        ...newCommentData,
+        createdAt: new Date().toISOString(),
+      };
+
       setNewComment("");
 
-      setComments((prevComments) => [newCommentData, ...prevComments]);
+      setComments((prevComments) => [commentWithCurrentTime, ...prevComments]);
 
       await onCommentAdded();
     } catch (error) {
