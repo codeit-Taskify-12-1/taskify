@@ -41,9 +41,7 @@ const TaskCommentInput: React.FC<TaskCommentInputProps> = ({
       };
 
       setNewComment("");
-
       setComments((prevComments) => [commentWithCurrentTime, ...prevComments]);
-
       await onCommentAdded();
     } catch (error) {
       console.error("댓글 추가 실패:", error);

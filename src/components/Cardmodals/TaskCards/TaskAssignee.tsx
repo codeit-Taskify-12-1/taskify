@@ -42,14 +42,13 @@ export default TaskAssignee;
 const CardMetaBox = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  padding: 14.5px 16px;
 
   border-radius: 8px;
   border: 1px solid #ddd;
   margin-top: 16px;
-  width: 100%;
-  height: 180px;
+  width: 181px;
+  height: 155px;
   background-color: white;
 
   @media (max-width: 1199px) {
@@ -58,24 +57,32 @@ const CardMetaBox = styled.div`
 
   @media (max-width: 767px) {
     height: 90px;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+    padding: 9px 16px;
   }
 `;
 
 const Assignee = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+
+  @media (max-width: 767px) {
+    margin-bottom: 0;
+  }
 `;
 
 const DueDate = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
   white-space: nowrap;
+
+  @media (max-width: 767px) {
+  }
 `;
 
 const AssigneeDetails = styled.div`
