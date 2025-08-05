@@ -34,6 +34,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
   const [comments, setComments] = useState<any[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -74,7 +75,10 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 
   return (
     <>
-      <CustomModal isOpen={isOpen} onClose={onClose}>
+      <CustomModal 
+        isOpen={isOpen} 
+        onClose={onClose}
+      >
         <div
           className={styles.modalContent}
           onClick={(e) => e.stopPropagation()}

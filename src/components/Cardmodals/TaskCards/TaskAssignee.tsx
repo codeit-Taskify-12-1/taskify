@@ -47,7 +47,7 @@ const CardMetaBox = styled.div`
   border-radius: 8px;
   border: 1px solid #ddd;
   margin-top: 16px;
-  width: 181px;
+  width: 220px;
   height: 155px;
   background-color: white;
 

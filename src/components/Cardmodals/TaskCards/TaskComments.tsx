@@ -25,6 +25,10 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [displayedComments, setDisplayedComments] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const observerRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
@@ -33,11 +37,17 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     }
   }, [cardId]);
 
-
+  useEffect(() => {
+    if (comments.length > 0) {
+      const initialComments = comments.slice(0, 3);
+      setDisplayedComments(initialComments);
+      setHasMore(comments.length > 3);
+    }
+  }, [comments]);
 
   const fetchComments = async () => {
     if (!cardId || loading) return;
-    
+
     setLoading(true);
     try {
       const response = await getComments(cardId, 100, null);
@@ -49,6 +59,40 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     }
     setLoading(false);
   };
+
+  const loadMoreComments = () => {
+    if (!hasMore || loading) return;
+
+    const nextPage = page + 1;
+    const startIndex = (nextPage - 1) * 3;
+    const endIndex = startIndex + 3;
+    const newComments = comments.slice(startIndex, endIndex);
+
+    if (newComments.length > 0) {
+      setDisplayedComments(prev => [...prev, ...newComments]);
+      setPage(nextPage);
+      setHasMore(endIndex < comments.length);
+    } else {
+      setHasMore(false);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, page, comments]);
 
   const closeDropdown = () => {
     setOpenDropdownId(null);
@@ -92,7 +136,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     <CommentListWrapper>
       <CommentListContainer>
         <CommentList>
-          {comments.map((comment) => (
+          {displayedComments.map((comment) => (
             <TaskCommentItem key={comment.id}>
               <ProfileImage src={comment.author.profileImageUrl} alt="프로필" />
               <CommentContentWrapper>
@@ -115,8 +159,8 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                         )
                       }
                     />
-                                         {openDropdownId === comment.id && (
-                       <DropdownMenu className="dropdown-menu">
+                    {openDropdownId === comment.id && (
+                      <DropdownMenu className="dropdown-menu">
                         {editingCommentId === comment.id ? (
                           <DropdownItem
                             onClick={() => handleUpdateComment(comment.id)}
@@ -124,7 +168,9 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                             저장
                           </DropdownItem>
                         ) : (
-                          <DropdownItem onClick={() => handleEditClick(comment)}>
+                          <DropdownItem
+                            onClick={() => handleEditClick(comment)}
+                          >
                             수정
                           </DropdownItem>
                         )}
@@ -144,13 +190,15 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                     autoFocus
                   />
                 ) : (
-                  <TaskCommentText>{comment.content}</TaskCommentText>
+                  <CommentText>{comment.content}</CommentText>
                 )}
               </CommentContentWrapper>
             </TaskCommentItem>
           ))}
-          {loading && (
-            <LoadingText>로딩 중...</LoadingText>
+          {hasMore && (
+            <LoadingObserver ref={observerRef}>
+              {loading ? "로딩 중..." : "더 보기"}
+            </LoadingObserver>
           )}
         </CommentList>
       </CommentListContainer>
@@ -235,7 +283,6 @@ const TaskCommentItem = styled.li`
   border-bottom: 1px solid #eee;
   width: 100%;
   min-height: 60px;
-  padding-bottom: 8px;
 
   word-break: break-word;
   white-space: pre-wrap;
@@ -272,7 +319,7 @@ const CommentTime = styled.span`
   color: #999;
 `;
 
-const TaskCommentText = styled.p`
+const CommentText = styled.p`
   font-size: 16px;
   color: #333;
   word-break: break-word;
@@ -301,46 +348,20 @@ const DropdownMenu = styled.ul`
   border-radius: 6px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   list-style: none;
-  padding: 4px 6px;
+  padding: 8px;
   text-align: center;
-  width: 60px;
-  height: 50px;
+  width: 80px;
+  height: 60px;
   margin: 8px;
-
-  @media (min-width: 768px) {
-    width: 70px;
-    height: 60px;
-    padding: 5px 7px;
-  }
-
-  @media (min-width: 1024px) {
-    width: 80px;
-    height: 70px;
-    padding: 6px 8px;
-  }
 `;
 
 const DropdownItem = styled.li`
   cursor: pointer;
   white-space: nowrap;
-  margin-bottom: 4px;
-  padding: 1px 0;
-  font-size: 12px;
+  margin-bottom: 8px;
   &:hover {
     background: #f1effd;
     color: #5534da;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 13px;
-    margin-bottom: 5px;
-    padding: 2px 0;
-  }
-
-  @media (min-width: 1024px) {
-    font-size: 14px;
-    margin-bottom: 6px;
-    padding: 2px 0;
   }
 `;
 
@@ -348,4 +369,11 @@ const ProfileImage = styled.img`
   width: 34px;
   height: 34px;
   border-radius: 50%;
+`;
+
+const LoadingObserver = styled.div`
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
 `;

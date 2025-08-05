@@ -5,6 +5,10 @@
   max-height: 90vh;
   overflow: auto;
 
+  @media (max-width: 1024px) and (min-width: 769px) {
+    width: 678px;
+  }
+
   @media (max-width: 768px) {
     width: 100%;
     padding: 20px;
@@ -150,3 +154,8 @@
     font-size: 14px;
   }
 }
+.hiddenModal {
+  background-color: transparent !important;
+  pointer-events: none;
+}
+
