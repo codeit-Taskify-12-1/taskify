@@ -217,7 +217,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
     <CustomTaskEditModal
       isOpen={isOpen}
       onClose={onClose}
-      width="auto"
+      width=""
       height="auto"
       className={styles.customTaskEditModal}
     >

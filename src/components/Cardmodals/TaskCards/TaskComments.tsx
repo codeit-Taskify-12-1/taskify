@@ -21,149 +21,38 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   setComments,
   handleOpenEditModal,
 }) => {
-  const [cursorId, setCursorId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const dropdownRef = useRef<HTMLUListElement | null>(null);
-  const [scrollInfo, setScrollInfo] = useState({ isAtBottom: false, scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
-  
-  // 클라이언트 사이드 페이지네이션을 위한 상태
-  const [allComments, setAllComments] = useState<any[]>([]);
   const [displayedComments, setDisplayedComments] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 3;
-
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
-    
-    setScrollInfo({
-      isAtBottom,
-      scrollTop,
-      scrollHeight,
-      clientHeight
-    });
-    
-    console.log("스크롤 정보:", { isAtBottom, scrollTop, scrollHeight, clientHeight });
-  };
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
     if (cardId) {
-      console.log("카드 변경됨, 상태 초기화:", cardId);
-      // 모달 재접속 시 상태 초기화
-      setComments([]);
-      setAllComments([]);
-      setDisplayedComments([]);
-      setCurrentPage(1);
-      setCursorId(null);
-      setHasMore(true);
-      setLoading(false);
-      
-      // 약간의 지연 후 초기 댓글 로드
-      setTimeout(() => {
-        fetchComments(true);
-      }, 100);
+      fetchComments();
     }
   }, [cardId]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpenDropdownId(null);
-      }
-    };
-
-    if (openDropdownId !== null) {
-      document.addEventListener("mousedown", handleClickOutside);
+    if (comments.length > 0) {
+      const initialComments = comments.slice(0, 3);
+      setDisplayedComments(initialComments);
+      setHasMore(comments.length > 3);
     }
+  }, [comments]);
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openDropdownId]);
+  const fetchComments = async () => {
+    if (!cardId || loading) return;
 
-  useEffect(() => {
-    // 기존 observer 정리
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-
-    // 새로운 observer 설정
-    if (hasMore && !loading && displayedComments.length > 0) {
-      const trigger = document.getElementById("scroll-trigger");
-      if (trigger) {
-        console.log("스크롤 트리거 설정됨");
-        observer.current = new IntersectionObserver(
-          (entries) => {
-            if (entries[0].isIntersecting && hasMore && !loading) {
-              console.log("스크롤 트리거 감지됨, 추가 댓글 로드");
-              fetchComments(false);
-            }
-          },
-          {
-            root: null,
-            rootMargin: "50px",
-            threshold: 0.1,
-          }
-        );
-        observer.current.observe(trigger);
-      }
-    }
-
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-    };
-  }, [hasMore, loading, displayedComments.length]);
-
-  const fetchComments = async (reset = false) => {
-    if (!cardId || loading) {
-      console.log("fetchComments 조건 불충족:", { cardId, loading });
-      return;
-    }
-    
-    console.log("fetchComments 시작:", { reset });
     setLoading(true);
-    
     try {
-      // 모든 댓글을 한번에 가져오기 (size를 충분히 크게 설정)
       const response = await getComments(cardId, 100, null);
-      console.log("API 응답:", response);
-      
       if (response && response.comments) {
-        if (reset) {
-          // 초기 로딩: 모든 댓글 저장하고 첫 3개만 표시
-          setAllComments(response.comments);
-          setDisplayedComments(response.comments.slice(0, commentsPerPage));
-          setCurrentPage(1);
-          setHasMore(response.comments.length > commentsPerPage);
-          console.log("초기 로딩:", { 
-            totalComments: response.comments.length, 
-            displayedComments: response.comments.slice(0, commentsPerPage).length 
-          });
-        } else {
-          // 추가 로딩: 다음 3개 추가
-          const nextPage = currentPage + 1;
-          const startIndex = (nextPage - 1) * commentsPerPage;
-          const endIndex = startIndex + commentsPerPage;
-          const newComments = response.comments.slice(startIndex, endIndex);
-          
-          setDisplayedComments(prev => [...prev, ...newComments]);
-          setCurrentPage(nextPage);
-          setHasMore(endIndex < response.comments.length);
-          
-          console.log("추가 로딩:", { 
-            page: nextPage, 
-            newComments: newComments.length,
-            totalDisplayed: displayedComments.length + newComments.length
-          });
-        }
+        setComments(response.comments);
       }
     } catch (error) {
       console.error("댓글 조회 실패:", error);
@@ -171,10 +60,48 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     setLoading(false);
   };
 
+  const loadMoreComments = () => {
+    if (!hasMore || loading) return;
+
+    const nextPage = page + 1;
+    const startIndex = (nextPage - 1) * 3;
+    const endIndex = startIndex + 3;
+    const newComments = comments.slice(startIndex, endIndex);
+
+    if (newComments.length > 0) {
+      setDisplayedComments(prev => [...prev, ...newComments]);
+      setPage(nextPage);
+      setHasMore(endIndex < comments.length);
+    } else {
+      setHasMore(false);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, page, comments]);
+
+  const closeDropdown = () => {
+    setOpenDropdownId(null);
+  };
+
   const handleEditClick = (comment: any) => {
     setEditingCommentId(comment.id);
     setEditContent(comment.content);
-    handleOpenEditModal?.();
+    closeDropdown();
   };
 
   const handleUpdateComment = async (commentId: number) => {
@@ -189,6 +116,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
         )
       );
       setEditingCommentId(null);
+      closeDropdown();
     } catch (error) {
       console.error("댓글 수정 실패:", error);
     }
@@ -198,6 +126,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     try {
       await deleteComment(commentId);
       setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      closeDropdown();
     } catch (error) {
       console.error("댓글 삭제 실패:", error);
     }
@@ -205,9 +134,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
 
   return (
     <CommentListWrapper>
-      <CommentListContainer
-        onScroll={handleScroll}
-      >
+      <CommentListContainer>
         <CommentList>
           {displayedComments.map((comment) => (
             <TaskCommentItem key={comment.id}>
@@ -233,7 +160,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                       }
                     />
                     {openDropdownId === comment.id && (
-                      <DropdownMenu ref={dropdownRef}>
+                      <DropdownMenu className="dropdown-menu">
                         {editingCommentId === comment.id ? (
                           <DropdownItem
                             onClick={() => handleUpdateComment(comment.id)}
@@ -241,7 +168,9 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                             저장
                           </DropdownItem>
                         ) : (
-                          <DropdownItem onClick={() => handleEditClick(comment)}>
+                          <DropdownItem
+                            onClick={() => handleEditClick(comment)}
+                          >
                             수정
                           </DropdownItem>
                         )}
@@ -258,30 +187,18 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                   <EditInput
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    onBlur={() => handleUpdateComment(comment.id)}
+                    autoFocus
                   />
                 ) : (
-                  <TaskCommentText>{comment.content}</TaskCommentText>
+                  <CommentText>{comment.content}</CommentText>
                 )}
               </CommentContentWrapper>
             </TaskCommentItem>
           ))}
           {hasMore && (
-            <div
-              id="scroll-trigger"
-              style={{ 
-                height: "40px", 
-                display: "flex", 
-                justifyContent: "center", 
-                alignItems: "center",
-                padding: "8px",
-                margin: "8px 0",
-                color: "#999",
-                fontSize: "12px"
-              }}
-            >
+            <LoadingObserver ref={observerRef}>
               {loading ? "로딩 중..." : "더 보기"}
-            </div>
+            </LoadingObserver>
           )}
         </CommentList>
       </CommentListContainer>
@@ -290,6 +207,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
 };
 
 export default TaskComments;
+
+const LoadingText = styled.div`
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
+`;
 
 const EditInput = styled.textarea`
   width: 80%;
@@ -395,7 +319,7 @@ const CommentTime = styled.span`
   color: #999;
 `;
 
-const TaskCommentText = styled.p`
+const CommentText = styled.p`
   font-size: 16px;
   color: #333;
   word-break: break-word;
@@ -440,8 +364,16 @@ const DropdownItem = styled.li`
     color: #5534da;
   }
 `;
+
 const ProfileImage = styled.img`
   width: 34px;
   height: 34px;
   border-radius: 50%;
+`;
+
+const LoadingObserver = styled.div`
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
 `;

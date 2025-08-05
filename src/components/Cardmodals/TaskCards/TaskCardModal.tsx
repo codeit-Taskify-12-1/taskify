@@ -34,6 +34,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
   const [comments, setComments] = useState<any[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -67,14 +68,17 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
     setIsEditModalOpen(true);
   };
 
-  // ✅ cardData 변경될 때 컬럼 최신화 적용
+  // cardData 변경될 때 컬럼 최신화 적용
   useEffect(() => {
     console.log("🔄 TaskCardModal에서 최신 cardData 반영됨:", cardData);
   }, [cardData]);
 
   return (
     <>
-      <CustomModal isOpen={isOpen} onClose={onClose}>
+      <CustomModal 
+        isOpen={isOpen} 
+        onClose={onClose}
+      >
         <div
           className={styles.modalContent}
           onClick={(e) => e.stopPropagation()}
@@ -87,6 +91,19 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 
           <div className={styles.headerContainer}>
             <h2 className={styles.title}>{cardData?.title || "제목 없음"}</h2>
+          </div>
+
+          {/* 모바일용 담당자/마감일 섹션 */}
+          <div className={styles.mobileAssigneeSection}>
+            <TaskAssignee
+              assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
+              dueDate={cardData?.dueDate ?? "마감일 없음"}
+            />
+          </div>
+
+          {/* 모바일용 태그 섹션 */}
+          <div className={styles.mobileTagsSection}>
+            <TaskTags tags={cardData?.tags || []} />
           </div>
 
           <div className={styles.columnAndTagsContainer}>
@@ -103,10 +120,15 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
               <TaskImage imageUrl={cardData?.imageUrl} />
             </div>
 
-            <TaskAssignee
-              assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
-              dueDate={cardData?.dueDate ?? "마감일 없음"}
-            />
+            <div className={styles.rightContent}>
+              {/* PC/태블릿용 담당자/마감일 - 모바일에서는 숨김 */}
+              <div className={styles.desktopAssigneeSection}>
+                <TaskAssignee
+                  assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
+                  dueDate={cardData?.dueDate ?? "마감일 없음"}
+                />
+              </div>
+            </div>
           </div>
 
           <div className={styles.commentSection}>
@@ -126,7 +148,8 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
           </div>
         </div>
       </CustomModal>
-      {isEditModalOpen && (
+
+      {cardData && (
         <TaskEditModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
@@ -135,6 +158,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
           dashboardId={dashboardId}
           updateTaskDetails={(updatedTask) => {
             setCardData(updatedTask);
+            setIsEditModalOpen(false);
           }}
         />
       )}
