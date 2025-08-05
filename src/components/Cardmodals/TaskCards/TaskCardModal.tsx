@@ -10,7 +10,6 @@ import TaskCommentInput from "./TaskCommentInput";
 import { getCardDetail } from "@/src/api/cards";
 import { getComments } from "@/src/api/comments";
 import styles from "./TaskCardModal.module.scss";
-import TaskEditModal from "../EditCards/TaskEditModal";
 
 interface TaskCardModalProps {
   isOpen: boolean;
@@ -25,6 +24,7 @@ interface TaskCardModalProps {
 const TaskCardModal: React.FC<TaskCardModalProps> = ({
   isOpen,
   onClose,
+  onOpenEditModal,
   cardId,
   columnTitle,
   columnId,
@@ -32,8 +32,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 }) => {
   const [cardData, setCardData] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
 
   useEffect(() => {
     if (isOpen) {
@@ -65,20 +63,17 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 
   const handleOpenEditModal = () => {
     console.log("수정 모달 열기 시도!");
-    setIsEditModalOpen(true);
+    onOpenEditModal();
   };
 
   // cardData 변경될 때 컬럼 최신화 적용
   useEffect(() => {
-    console.log("🔄 TaskCardModal에서 최신 cardData 반영됨:", cardData);
+    console.log("TaskCardModal에서 최신 cardData 반영됨:", cardData);
   }, [cardData]);
 
   return (
     <>
-      <CustomModal 
-        isOpen={isOpen} 
-        onClose={onClose}
-      >
+      <CustomModal isOpen={isOpen} onClose={onClose}>
         <div
           className={styles.modalContent}
           onClick={(e) => e.stopPropagation()}
@@ -148,20 +143,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
           </div>
         </div>
       </CustomModal>
-
-      {cardData && (
-        <TaskEditModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          task={cardData}
-          fetchCards={fetchComments}
-          dashboardId={dashboardId}
-          updateTaskDetails={(updatedTask) => {
-            setCardData(updatedTask);
-            setIsEditModalOpen(false);
-          }}
-        />
-      )}
     </>
   );
 };

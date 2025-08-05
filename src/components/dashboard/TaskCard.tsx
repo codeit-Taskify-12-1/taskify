@@ -2,6 +2,7 @@ import Image from "next/image";
 import styles from "./TaskCard.module.scss";
 import { useState } from "react";
 import TaskCardModal from "../Cardmodals/TaskCards/TaskCardModal";
+import TaskEditModal from "../Cardmodals/EditCards/TaskEditModal";
 import React from "react";
 import TaskTags from "../Cardmodals/TaskCards/TaskTags";
 import { styled } from "styled-components";
@@ -14,16 +15,24 @@ export default function TaskCard({
   dashboardId,
   onCardDelete,
 }: any) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openCardModal = () => setIsCardModalOpen(true);
+  const closeCardModal = () => setIsCardModalOpen(false);
+  
+  const openEditModal = () => {
+    setIsCardModalOpen(false); // 할일카드 모달 닫기
+    setIsEditModalOpen(true);  // 수정모달 열기
+  };
+  
+  const closeEditModal = () => setIsEditModalOpen(false);
   const dueDate = card.dueDate;
   const date = dueDate ? dueDate.split(" ")[0] : "";
 
   return (
     <div className={styles.taskWrapper}>
-      <div onClick={openModal}>
+      <div onClick={openCardModal}>
         <div className={styles.tabletContent}>
           <Image
             className={styles.taskImg}
@@ -70,15 +79,29 @@ export default function TaskCard({
         </div>
       </div>
 
-      {isModalOpen && (
+      {isCardModalOpen && (
         <TaskCardModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onOpenEditModal={() => {}}
+          isOpen={isCardModalOpen}
+          onClose={closeCardModal}
+          onOpenEditModal={openEditModal}
           cardId={card.id}
           columnTitle={columnTitle}
           columnId={columnId}
           dashboardId={dashboardId}
+        />
+      )}
+      
+      {isEditModalOpen && card && (
+        <TaskEditModal
+          isOpen={isEditModalOpen}
+          onClose={closeEditModal}
+          task={card}
+          fetchCards={() => {}}
+          dashboardId={dashboardId}
+          updateTaskDetails={(updatedTask) => {
+            // 카드 데이터 업데이트 로직
+            closeEditModal();
+          }}
         />
       )}
     </div>
