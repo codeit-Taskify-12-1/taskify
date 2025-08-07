@@ -33,22 +33,45 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
 
   useEffect(() => {
     if (cardId) {
+      setDisplayedComments([]);
+      setHasMore(false);
+      setPage(1);
+      setLoading(false);
+      setEditingCommentId(null);
+      setEditContent("");
+      setOpenDropdownId(null);
+      setComments([]);
       fetchComments();
     }
   }, [cardId]);
 
   useEffect(() => {
     if (comments.length > 0) {
-      const initialComments = comments.slice(0, 3);
-      setDisplayedComments(initialComments);
-      setHasMore(comments.length > 3);
+      if (displayedComments.length === 0) {
+        const initialComments = comments.slice(0, 2);
+        setDisplayedComments(initialComments);
+        setHasMore(comments.length > 2);
+      } else if (comments.length > displayedComments.length) {
+        const latestComment = comments[0];
+        
+        const isAlreadyDisplayed = displayedComments.some(comment => comment.id === latestComment.id);
+        
+        if (!isAlreadyDisplayed) {
+          setDisplayedComments(prev => [latestComment, ...prev]);
+        }
+      }
+    } else {
+      setHasMore(false);
     }
-  }, [comments]);
+  }, [comments, displayedComments.length]);
 
   const fetchComments = async () => {
     if (!cardId || loading) return;
 
     setLoading(true);
+    // 기존 comments 초기화
+    setComments([]);
+    
     try {
       const response = await getComments(cardId, 100, null);
       if (response && response.comments) {
@@ -63,14 +86,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   const loadMoreComments = () => {
     if (!hasMore || loading) return;
 
-    const nextPage = page + 1;
-    const startIndex = (nextPage - 1) * 3;
-    const endIndex = startIndex + 3;
+    const startIndex = displayedComments.length;
+    const endIndex = Math.min(startIndex + 2, comments.length);
     const newComments = comments.slice(startIndex, endIndex);
 
     if (newComments.length > 0) {
       setDisplayedComments(prev => [...prev, ...newComments]);
-      setPage(nextPage);
+      setPage(prev => prev + 1);
       setHasMore(endIndex < comments.length);
     } else {
       setHasMore(false);
@@ -92,7 +114,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     }
 
     return () => observer.disconnect();
-  }, [hasMore, page, comments]);
+  }, [hasMore, page]);
 
   const closeDropdown = () => {
     setOpenDropdownId(null);
@@ -115,6 +137,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
             : comment
         )
       );
+      setDisplayedComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? { ...comment, content: editContent }
+            : comment
+        )
+      );
       setEditingCommentId(null);
       closeDropdown();
     } catch (error) {
@@ -126,6 +155,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     try {
       await deleteComment(commentId);
       setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      setDisplayedComments((prev) => prev.filter((comment) => comment.id !== commentId));
       closeDropdown();
     } catch (error) {
       console.error("댓글 삭제 실패:", error);
@@ -136,8 +166,8 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     <CommentListWrapper>
       <CommentListContainer>
         <CommentList>
-          {displayedComments.map((comment) => (
-            <TaskCommentItem key={comment.id}>
+          {displayedComments.map((comment, index) => (
+            <TaskCommentItem key={`${comment.id}-${index}`}>
               <ProfileImage src={comment.author.profileImageUrl} alt="프로필" />
               <CommentContentWrapper>
                 <CommentHeader>
@@ -147,6 +177,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                       {dayjs(comment.createdAt).format("YYYY.MM.DD HH:mm")}
                     </CommentTime>
                   </CommentMeta>
+                  
                   <DropdownContainer>
                     <DropdownIcon
                       src="/icons/kebab.svg"
@@ -183,6 +214,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
                     )}
                   </DropdownContainer>
                 </CommentHeader>
+                
                 {editingCommentId === comment.id ? (
                   <EditInput
                     value={editContent}
@@ -195,6 +227,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
               </CommentContentWrapper>
             </TaskCommentItem>
           ))}
+          
           {hasMore && (
             <LoadingObserver ref={observerRef}>
               {loading ? "로딩 중..." : "더 보기"}
@@ -228,6 +261,7 @@ const EditInput = styled.textarea`
   word-break: break-word;
   white-space: pre-wrap;
   background: white;
+  margin-top: 8px;
 `;
 
 const CommentListWrapper = styled.div`
@@ -283,10 +317,10 @@ const TaskCommentItem = styled.li`
   border-bottom: 1px solid #eee;
   width: 100%;
   min-height: 60px;
-
   word-break: break-word;
   white-space: pre-wrap;
   margin-top: 12px;
+  padding-bottom: 16px;
 `;
 
 const CommentContentWrapper = styled.div`
@@ -343,22 +377,29 @@ const DropdownMenu = styled.ul`
   position: absolute;
   top: 100%;
   right: 0;
-
   background: white;
   border-radius: 6px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   list-style: none;
-  padding: 8px;
+  padding: 6px;
   text-align: center;
   width: 80px;
   height: 60px;
   margin: 8px;
+  z-index: 1000;
 `;
 
 const DropdownItem = styled.li`
   cursor: pointer;
   white-space: nowrap;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   &:hover {
     background: #f1effd;
     color: #5534da;

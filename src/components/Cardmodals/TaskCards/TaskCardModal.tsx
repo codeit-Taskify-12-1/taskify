@@ -43,6 +43,8 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
       fetchComments();
     } else {
       document.body.style.overflow = "";
+      setComments([]);
+      setCardData(null);
     }
 
     return () => {
@@ -52,7 +54,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 
   const fetchComments = async () => {
     try {
-      const response = await getComments(cardId, 10, null);
+      const response = await getComments(cardId, 10000, null);
       if (response && response.comments) {
         setComments(response.comments);
       }
@@ -62,13 +64,10 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
   };
 
   const handleOpenEditModal = () => {
-    console.log("수정 모달 열기 시도!");
     onOpenEditModal();
   };
 
-  // cardData 변경될 때 컬럼 최신화 적용
   useEffect(() => {
-    console.log("TaskCardModal에서 최신 cardData 반영됨:", cardData);
   }, [cardData]);
 
   return (
@@ -135,6 +134,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
               setComments={setComments}
             />
             <TaskComments
+              key={cardId} // cardId가 변경될 때마다 새로운 컴포넌트 인스턴스
               cardId={cardId}
               comments={comments}
               setComments={setComments}
