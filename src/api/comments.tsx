@@ -2,7 +2,7 @@ import axiosInstance from "./axios";
 
 export const getComments = async (
   cardId: number | null,
-  size: number = 10,
+  size?: number,
   cursorId: number | null = null
 ) => {
   try {
@@ -11,8 +11,20 @@ export const getComments = async (
       return null;
     }
 
+    const params: any = { cardId };
+    if (size !== undefined) {
+      params.size = size;
+    }
+    if (cursorId) {
+      params.cursorId = cursorId;
+    }
+
     const response = await axiosInstance.get(`/comments`, {
-      params: { cardId, size, ...(cursorId ? { cursorId } : {}) },
+      params,
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
     });
     return response.data;
   } catch (error: any) {

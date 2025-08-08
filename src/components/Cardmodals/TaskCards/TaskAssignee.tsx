@@ -51,8 +51,8 @@ const CardMetaBox = styled.div`
   height: 155px;
   background-color: white;
 
-  @media (max-width: 1199px) {
-    right: 20px;
+  @media (max-width: 1024px) {
+    width: 200px
   }
 
   @media (max-width: 767px) {
