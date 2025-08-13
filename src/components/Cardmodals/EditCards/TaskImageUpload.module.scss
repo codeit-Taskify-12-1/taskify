@@ -11,6 +11,11 @@
   line-height: 26px;
   color: #333;
   pointer-events: none;
+
+  @media (max-width: 768px) {
+    font-size: 12px; // 18px에서 12px로 줄임
+    line-height: 16px; // 26px에서 16px로 줄임
+  }
 }
 
 .uploadBox {

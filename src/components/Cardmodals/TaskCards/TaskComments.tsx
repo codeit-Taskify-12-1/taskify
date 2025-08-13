@@ -34,13 +34,13 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
   useEffect(() => {
     if (cardId) {
       setDisplayedComments([]);
-      setHasMore(false);
+      setHasMore(true);
       setPage(1);
       setLoading(false);
       setEditingCommentId(null);
       setEditContent("");
       setOpenDropdownId(null);
-      setComments([]);
+      // setComments([]); // 이 줄만 제거 - 부모 상태와 충돌 방지
       fetchComments();
     }
   }, [cardId]);
@@ -99,14 +99,21 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     }
   };
 
+  // 강제로 스크롤 로딩을 트리거하는 함수
+  const forceLoadMore = () => {
+    if (hasMore && !loading && comments.length > displayedComments.length) {
+      loadMoreComments();
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           loadMoreComments();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '100px' }
     );
 
     if (observerRef.current) {
@@ -114,7 +121,7 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
     }
 
     return () => observer.disconnect();
-  }, [hasMore, page]);
+  }, [hasMore, loading, displayedComments.length]); // displayedComments.length도 의존성에 추가
 
   const closeDropdown = () => {
     setOpenDropdownId(null);
@@ -229,8 +236,12 @@ const TaskComments: React.FC<TaskCommentsProps> = ({
           ))}
           
           {hasMore && (
-            <LoadingObserver ref={observerRef}>
-              {loading ? "로딩 중..." : "더 보기"}
+            <LoadingObserver 
+              ref={observerRef}
+              onClick={forceLoadMore}
+              style={{ cursor: 'pointer' }}
+            >
+              {loading ? "로딩 중..." : "더 보기 (클릭)"}
             </LoadingObserver>
           )}
         </CommentList>
