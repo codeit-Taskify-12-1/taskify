@@ -9,6 +9,11 @@
   font-weight: 500;
   line-height: 26px;
   color: #333;
+
+  @media (max-width: 768px) {
+    font-size: 12px; // 14px에서 12px로 더 줄임
+    line-height: 16px; // 18px에서 16px로 줄임
+  }
 }
 
 .tagInput {
@@ -20,9 +25,16 @@
   border-radius: 8px;
   background-color: #fff;
   width: 100%;
-  min-height: 48px;
+  height: 48px; // min-height에서 height로 변경하여 고정 높이 설정
   align-items: center;
   overflow-x: auto;
+  overflow-y: hidden; // 세로 스크롤 숨김
+
+  @media (max-width: 768px) {
+    height: 48px; // PC/태블릿과 동일한 높이 유지
+    padding: 8px; // 패딩도 동일하게 유지
+    overflow-y: hidden; // 모바일에서도 세로 스크롤 숨김
+  }
 }
 
 .tagInputField {
