@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 export default function DeleteContainer({
   dashboardId,
 }: {
-  dashboardId: string | string[] | undefined;
+  dashboardId: string;
 }) {
   const [isModal, setIsModal] = useState<boolean>(false);
   const isMessage = "이 대시보드를 삭제하시겠습니까?";

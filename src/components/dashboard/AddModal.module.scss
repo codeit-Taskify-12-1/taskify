@@ -1,9 +1,14 @@
 @use "/styles/color.scss" as *;
+
+.modalWidth {
+  width: 568px;
+}
+
 .modalContent {
-  border-radius: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: auto;
   h2 {
     font-weight: 700;
     font-size: 24px;
@@ -25,7 +30,6 @@
   border: 1px solid $gray3;
   border-radius: 6px;
   height: 50px;
-
   font-family: Pretendard;
   font-weight: 400;
   font-size: 16px;
@@ -92,4 +96,134 @@
 
 .create:hover {
   background-color: $violet2;
+  opacity: 0.6;
+}
+
+.create:disabled {
+  background-color: $gray4;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.errorInput {
+  border: 1px solid red !important;
+  background-color: #ffe6e6;
+}
+.dropdown {
+  position: relative;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 2px 10px;
+  cursor: pointer;
+  background: white;
+  height: 50px;
+  margin-bottom: 12px;
+}
+
+.selected {
+  padding: 8px;
+  border-radius: 5px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.dropdownMenu {
+  background-color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 100%;
+  left: 30px;
+  width: 90%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.dropdownItem {
+  padding: 8px;
+  cursor: pointer;
+  height: 50px;
+  border-bottom: 1px solid $gray3;
+  display: flex;
+  align-items: center;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0%;
+}
+
+.dropdownItem:hover {
+  background: #f0f0f0;
+}
+
+.memberCircle {
+  width: 30px;
+  height: 30px;
+  border-radius: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #a3c4a2;
+  color: $white;
+}
+
+.errorInput {
+  border: 1px solid red !important;
+  background-color: #ffe6e6;
+}
+
+.tagInputContainer {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.input {
+  flex-grow: 1;
+}
+
+.tagsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.tagItem {
+  background-color: #f1f1f1;
+  color: #333;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+/* 빨간 테두리 */
+.errorBorder {
+  border: 1px solid red;
+}
+
+/* 에러 메시지 스타일 */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
 }

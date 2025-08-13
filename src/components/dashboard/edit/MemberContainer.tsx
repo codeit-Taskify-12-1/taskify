@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./EditPage.style.module.scss";
 import { useEdit } from "@/src/contexts/dashboard/edit/EditDashboardProvider";
-import { MemberItem } from "@/src/types/dashboard/edit/EditComponent";
+import { MemberItem } from "@/src/components/dashboard/edit/EditPageType";
 import { CheckModal } from "./modal/Check";
 import axiosInstance from "@/src/api/axios";
 import { Toast } from "./toast/Toast";

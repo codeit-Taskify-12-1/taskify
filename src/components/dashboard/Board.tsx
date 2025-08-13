@@ -29,7 +29,7 @@ export default function Board() {
 
   const fetchColumns = async () => {
     if (!id) return;
-    console.log("Fetching columns with:", id);
+
     try {
       const response = await getColumns(+id);
       if (response?.result === "SUCCESS") {
@@ -113,28 +113,26 @@ export default function Board() {
         </ListCard>
       </div>
 
-      <CustomModal
-        className={styles.listCardModal}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      >
-        <h2>칼럼 수정</h2>
-        <div>이름</div>
+      <CustomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className={styles.listCardModal}>
+          <h2>칼럼 추가하기</h2>
+          <div>제목</div>
 
-        <input
-          type="text"
-          value={newColumnTitle}
-          onChange={(e) => setNewColumnTitle(e.target.value)}
-          placeholder="컬럼 이름 입력"
-          className={styles.input}
-        />
-        <div className={styles.buttonGroup}>
-          <button className={styles.cancle} onClick={closeModal}>
-            취소
-          </button>
-          <button className={styles.create} onClick={handleAddColumn}>
-            생성
-          </button>
+          <input
+            type="text"
+            value={newColumnTitle}
+            onChange={(e) => setNewColumnTitle(e.target.value)}
+            placeholder="컬럼 이름 입력"
+            className={styles.input}
+          />
+          <div className={styles.buttonGroup}>
+            <button className={styles.cancle} onClick={closeModal}>
+              취소
+            </button>
+            <button className={styles.create} onClick={handleAddColumn}>
+              생성
+            </button>
+          </div>
         </div>
       </CustomModal>
     </DragDropContext>

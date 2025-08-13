@@ -4,9 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./Dropdown.module.scss";
 
-// interface DropdownProps {
-//   children?: React.ReactNode;
-// }
 
 export default function Dropdown() {
   const router = useRouter();

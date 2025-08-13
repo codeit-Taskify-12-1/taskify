@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { Button } from "../../button/CustomButton2";
-import { ArrowButton } from "@/src/types/dashboard/edit/EditPagination";
+import { ArrowButton } from "@/src/components/dashboard/edit/PaginationType";
 
 export const PaginationButton = styled(Button)<ArrowButton>`
   width: 40px;

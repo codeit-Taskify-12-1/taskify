@@ -7,6 +7,7 @@ export const ToastContainer = styled.div`
   justify-content: space-between;
   padding: 0 20px;
   width: calc(100vw * (200 / 1200));
+  min-width: 270px;
   height: 50px;
   position: fixed;
   left: 50%;

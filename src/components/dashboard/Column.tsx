@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Droppable } from "@hello-pangea/dnd";
 import TaskCard from "./TaskCard";
 import ListCard from "../dashboardlist/card/ListCard";
@@ -20,25 +18,39 @@ export default function Column({ column, onDelete }: any) {
   const [columnTitle, setColumnTitle] = useState(column.title);
   const [cursorId, setCursorId] = useState<number>();
   const [ref, inView] = useInView();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 확인 모달 상태
 
   useEffect(() => {
-    if (inView && cursorId !== null) {
+    fetchCards(true);
+  }, []);
+
+  useEffect(() => {
+    if (inView) {
       fetchCards();
     }
   }, [inView]);
 
-  const fetchCards = async () => {
+  const fetchCards = async (reset = false) => {
     try {
-      const response = cursorId
+      const response = reset
+        ? await axiosInstance.get("/cards", { params: { columnId: column.id } })
+        : cursorId
         ? await axiosInstance.get("/cards", {
             params: { columnId: column.id, cursorId },
           })
         : await axiosInstance.get("/cards", {
             params: { columnId: column.id },
           });
+
       const newCards = response.data.cards;
       const newCursorId = response.data.cursorId;
-      setCards((prevCards) => [...prevCards, ...newCards]);
+
+      if (reset) {
+        setCards(newCards);
+      } else {
+        setCards((prevCards) => [...prevCards, ...newCards]);
+      }
+
       setTotalCount(response.data.totalCount);
       setCursorId(newCursorId);
     } catch (error) {
@@ -55,7 +67,7 @@ export default function Column({ column, onDelete }: any) {
 
   const handleUpdateTitle = async () => {
     try {
-      await updateColumnTitle(column.id, columnTitle); // 컬럼 이름 수정
+      await updateColumnTitle(column.id, columnTitle);
       closeModal();
     } catch (error) {
       console.error("Error updating column title:", error);
@@ -63,22 +75,27 @@ export default function Column({ column, onDelete }: any) {
   };
 
   const handleDeleteColumn = async () => {
-    const confirmDelete = window.confirm(
-      "컬럼의 모든 카드가 삭제됩니다. 정말 삭제하시겠습니까?"
-    );
-    if (confirmDelete) {
-      try {
-        await deleteColumn(column.id); // 컬럼 삭제
-        onDelete(column.id);
-        closeModal();
-      } catch (error) {
-        console.error("Error deleting column:", error);
-      }
+    try {
+      await deleteColumn(column.id);
+      onDelete(column.id);
+      closeModal();
+    } catch (error) {
+      console.error("Error deleting column:", error);
     }
   };
 
-  const handleCardDelete = (cardId: string) => {
-    setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+    setIsModalOpen(false);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const confirmDeleteColumn = async () => {
+    await handleDeleteColumn();
+    closeDeleteModal();
   };
 
   return (
@@ -97,43 +114,35 @@ export default function Column({ column, onDelete }: any) {
           alt="설정"
         />
       </div>
-      <Droppable droppableId={String(column.id)}>
-        {(provided) => (
 
+      <div>
+        <ListCard className={styles.listcolumn}>
+          <Image
+            src="/icons/chip.svg"
+            width={22}
+            height={22}
+            alt="chip.svg"
+            onClick={() => openModal("add-column")}
+            style={{ cursor: "pointer" }}
+          />
+        </ListCard>
+        {cards?.map((card) => (
+          <TaskCard
+            key={card.id}
+            card={card}
+            className={styles.taskCard}
+            columnTitle={columnTitle}
+            columnId={column.id}
+            dashboardId={column.dashboardId}
+          />
+        ))}
+      </div>
 
-          <div ref={provided.innerRef} {...provided.droppableProps}>
-            <ListCard className={styles.listcolumn}>
-              <Image
-                src="/icons/chip.svg"
-                width={22}
-                height={22}
-                alt="chip.svg"
-                onClick={() => openModal("add-column")}
-                style={{ cursor: "pointer" }}
-              />
-            </ListCard>
-            {cards?.map((card) => (
-              <TaskCard
-                key={card.id}
-                card={card}
-                className={styles.taskCard}
-                columnTitle={columnTitle}
-                columnId={column.id} // 컬럼 ID 추가
-                dashboardId={column.dashboardId} // 대시보드 ID 추가
-                // onCardDelete={handleCardDelete}
-              />
-            ))}
-            {provided.placeholder}
-          </div>
-
-        )}
-      </Droppable>
-
-      {/* Modal */}
+      {/* 컬럼 설정 모달 */}
       <CustomModal isOpen={isModalOpen} onClose={closeModal}>
         {modalContent === "column-setting" && (
           <div className={styles.listCardModal}>
-            <h2>새 컬럼 생성</h2>
+            <h2>컬럼 수정</h2>
             <div>이름</div>
 
             <input
@@ -144,7 +153,7 @@ export default function Column({ column, onDelete }: any) {
               placeholder="컬럼 이름을 입력하세요"
             />
             <div className={styles.buttonGroup}>
-              <button className={styles.cancle} onClick={handleDeleteColumn}>
+              <button className={styles.cancle} onClick={openDeleteModal}>
                 삭제
               </button>
               <button className={styles.create} onClick={handleUpdateTitle}>
@@ -153,16 +162,40 @@ export default function Column({ column, onDelete }: any) {
             </div>
           </div>
         )}
+        {modalContent === "add-column" && (
+          <div>
+            <AddModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              columnId={column.id}
+              fetchCards={() => fetchCards(true)}
+            />
+          </div>
+        )}
       </CustomModal>
 
-      {modalContent === "add-column" && (
-        <AddModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          columnId={column.id}
-          fetchCards={fetchCards}
-        />
-      )}
+      {/* 삭제 확인 모달 */}
+      <CustomModal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
+        <div className={styles.listCardModal}>
+          <div
+            style={{
+              textAlign: "center",
+              marginBottom: "40px",
+              fontSize: "20px",
+            }}
+          >
+            컬럼의 모든 카드가 삭제됩니다
+          </div>
+          <div className={styles.buttonGroup}>
+            <button className={styles.cancle} onClick={closeDeleteModal}>
+              취소
+            </button>
+            <button className={styles.create} onClick={confirmDeleteColumn}>
+              삭제
+            </button>
+          </div>
+        </div>
+      </CustomModal>
     </div>
   );
 }

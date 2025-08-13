@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { Button } from "../../button/CustomButton2";
 import styles from "./EditPage.style.module.scss";
-import { MemberItem } from "@/src/types/dashboard/edit/EditComponent";
+import { MemberItem } from "@/src/components/dashboard/edit/EditPageType";
+import Image from "next/image";
 
 const EmptyData = styled.div`
   padding: 40px 0;
@@ -25,16 +26,39 @@ export function MemberList({
           <ul className={styles.memberList}>
             {isMembersData &&
               isMembersData?.map((item) => {
-                const { id } = item;
+                const { id, email, profileImageUrl, isOwner } = item;
                 return (
                   <li key={id} className={styles.tile}>
                     <div className={styles.profileCover}>
-                      <div className={styles.thumbnail}></div>
-                      <p className={styles.nickname}>{item.nickname}</p>
+                      <div className={styles.thumbnail}>
+                        {profileImageUrl ? (
+                          <Image
+                            src={profileImageUrl}
+                            width={100}
+                            height={100}
+                            alt="프로필 이미지"
+                          />
+                        ) : (
+                          email[0]
+                        )}
+                      </div>
+                      <div className={styles.nickname}>
+                        <p>{item.nickname}</p>
+                        {isOwner && (
+                          <Image
+                            src="/icons/crown.svg"
+                            width={20}
+                            height={20}
+                            alt="초대"
+                          />
+                        )}
+                      </div>
                     </div>
-                    <Button onClick={() => handleShowModal(id)} $sub>
-                      삭제
-                    </Button>
+                    {!isOwner && (
+                      <Button onClick={() => handleShowModal(id)} $sub>
+                        삭제
+                      </Button>
+                    )}
                   </li>
                 );
               })}

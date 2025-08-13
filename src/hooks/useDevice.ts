@@ -1,12 +1,12 @@
-"use client"; // 클라이언트에서만 실행되도록 설정
+"use client";
 
 import { useState, useEffect } from "react";
 
 export default function useDevice() {
-  const [device, setDevice] = useState("desktop"); // 기본값 (SSR 대비)
+  const [device, setDevice] = useState("desktop"); 
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // 서버에서는 실행 안 함
+    if (typeof window === "undefined") return; 
 
     const getDeviceType = () => {
       const width = window.innerWidth;
@@ -15,7 +15,7 @@ export default function useDevice() {
       return "desktop";
     };
 
-    setDevice(getDeviceType()); // 마운트 시 한 번 실행
+    setDevice(getDeviceType()); 
 
     const handleResize = () => setDevice(getDeviceType());
     window.addEventListener("resize", handleResize);

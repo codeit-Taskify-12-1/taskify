@@ -1,0 +1,165 @@
+.customTaskEditModal {
+  width: 750px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: visible;
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    width: 450px;
+    max-height: 80vh;
+    padding: 20px;
+  }
+}
+
+.taskEditTitle {
+  font-family: Pretendard, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: 0%;
+  color: #333236;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+}
+
+.statusLabel,
+.assigneeLabel {
+  font-family: Pretendard, sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0%;
+  color: #333236;
+  margin-bottom: 8px;
+}
+
+.inputField,
+.dateInputField,
+.tagInput {
+  height: 48px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.customTaskEditModal {
+  .formGroup {
+    margin-bottom: 32px;
+    display: block;
+
+    @media (max-width: 768px) {
+      margin-bottom: 20px;
+    }
+  }
+
+  .formGroup:last-child {
+    margin-bottom: 0;
+  }
+
+  .modalButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    @media (max-width: 768px) {
+      margin-top: 20px;
+    }
+  }
+}
+
+.descriptionField {
+  min-height: 120px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.statusAssigneeContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+  }
+}
+
+.statusBox,
+.assigneeBox {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.imageUploadWrapper {
+  display: block;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  flex-wrap: nowrap;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+  }
+}
+
+.cancelButton,
+.saveButton {
+  font-family: Pretendard, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 26px;
+  text-align: center;
+  height: 54px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 50%;
+}
+
+.cancelButton {
+  color: #787486;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+}
+
+.saveButton {
+  color: #ffffff;
+  background-color: #5534da;
+  border: none;
+  
+  &:disabled {
+    background-color: #d1d5db;
+    color: #787486;
+    cursor: not-allowed;
+  }
+}
+@media (max-width: 768px) {
+  .customTaskEditModal {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+}

@@ -1,14 +1,20 @@
+import { AxiosResponse } from "axios";
 import axiosInstance from "./axios";
+
+interface Column {
+  id: number;
+  title: string;
+}
 
 export const getColumns = async (dashboardId: number) => {
   try {
-    console.log(`컬럼 목록 조회 요청: /columns?dashboardId=${dashboardId}`);
+    const response = await axiosInstance.get<AxiosResponse<Column[]>>(
+      `/columns`,
+      {
+        params: { dashboardId },
+      }
+    );
 
-    const response = await axiosInstance.get(`/columns`, {
-      params: { dashboardId },
-    });
-
-    console.log("컬럼 목록 조회 응답:", response.data);
     return response.data.data;
   } catch (error: any) {
     console.error(

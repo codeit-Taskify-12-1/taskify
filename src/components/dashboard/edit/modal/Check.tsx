@@ -1,6 +1,6 @@
 import React from "react";
 import CustomModal from "@/src/components/modal/CustomModal";
-import { Button, ButtonContainer, Contents, MessageText } from "./style";
+import { Button, ButtonContainer, Contents, MessageText } from "./Style";
 
 export const CheckModal = ({
   isModal,
@@ -40,10 +40,15 @@ export const CheckModal = ({
               $confirm
               onClick={() => {
                 closeModal();
-                (member || invite) && setIsToast?.(true);
-                member && deleteMember?.();
-                invite && deleteInvitation?.();
-                dashboard && deleteDashboard?.();
+                if (member) {
+                  setIsToast?.(true);
+                  deleteMember?.();
+                } else if (invite) {
+                  setIsToast?.(true);
+                  deleteInvitation?.();
+                } else if (dashboard) {
+                  deleteDashboard?.();
+                }
               }}
             >
               {member || dashboard

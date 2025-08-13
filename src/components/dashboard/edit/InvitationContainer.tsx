@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./EditPage.style.module.scss";
 import { useEdit } from "@/src/contexts/dashboard/edit/EditDashboardProvider";
-import { InviteItem } from "@/src/types/dashboard/edit/EditComponent";
+import { InviteItem } from "@/src/components/dashboard/edit/EditPageType";
 import { CheckModal } from "./modal/Check";
 import axiosInstance from "@/src/api/axios";
 import { InviteButton } from "./InviteButton";
@@ -13,7 +13,7 @@ import { PaginationButton } from "./PaginationButton";
 export default function InvitationContainer({
   dashboardId,
 }: {
-  dashboardId: string | string[] | undefined;
+  dashboardId: string;
 }) {
   const [isInvitationsData, setIsInvitationsData] = useState<InviteItem[]>();
   const [isTotalCount, setIsTotalCount] = useState(1);

@@ -32,7 +32,6 @@ async function PUThWithAuth(url: string, params?: any) {
       return null;
     }
 
-    console.log("params", params);
     const res = await axiosInstance.put(url, { ...params?.body });
 
     return res.data;
@@ -146,6 +145,24 @@ export const deleteCard = async (cardId: number) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting column:", error);
+    throw error;
+  }
+};
+
+export const uploadImage = async (columnId: number, formData: FormData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/columns/${columnId}/card-image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading image:", error);
     throw error;
   }
 };

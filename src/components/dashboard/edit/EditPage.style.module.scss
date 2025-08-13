@@ -59,7 +59,7 @@
   }
 }
 
-// BebridgeContainer
+// DashboardContainer
 .contents .colorList {
   -webkit-display: flex;
   display: flex;
@@ -96,8 +96,14 @@
     .thumbnail {
       width: 38px;
       height: 38px;
+      line-height: 38px;
       border-radius: 50%;
       background: $black1;
+      overflow: hidden;
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      font-size: 18px;
 
       img {
         display: block;
@@ -107,9 +113,16 @@
       }
     }
     .nickname {
+      display: flex;
+      align-items: center;
       margin-left: 12px;
       font-size: 16px;
       font-weight: 400;
+
+      img {
+        margin-top: -4px;
+        margin-left: 5px;
+      }
     }
   }
 }

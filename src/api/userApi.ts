@@ -1,5 +1,4 @@
 import { User } from "@/src/types/users";
-import axios from "axios";
 import axiosInstance from "./axios";
 
 // 사용자 정보 API 함수 (getUser)
@@ -29,10 +28,7 @@ export const getUser = async (): Promise<User> => {
 };
 
 // 사용자 프로필 수정 API 함수
-export const updateProfile = async (
-  nickname: string,
-  profileImage: string | null
-) => {
+export const updateProfile = async (nickname: string, profileImage?: File) => {
   try {
     const accessToken = sessionStorage.getItem("accessToken");
 
@@ -44,8 +40,8 @@ export const updateProfile = async (
 
     const formData = new FormData();
     formData.append("nickname", nickname);
-    if (profileImage) {
-      formData.append("profileImage", profileImage);
+    if (profileImage !== undefined || profileImage) {
+      formData.append("profileImageUrl", profileImage);
     }
 
     const response = await axiosInstance.put("/users/me", formData, {
@@ -54,10 +50,9 @@ export const updateProfile = async (
         "Content-Type": "application/json",
       },
     });
-    console.log(response.data)
+
     return response.data;
   } catch (error) {
     console.error("프로필 업데이트 실패:", error);
-    throw error;
   }
 };

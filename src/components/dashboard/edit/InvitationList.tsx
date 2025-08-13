@@ -1,4 +1,4 @@
-import { InviteItem } from "@/src/types/dashboard/edit/EditComponent";
+import { InviteItem } from "@/src/components/dashboard/edit/EditPageType";
 import styles from "./EditPage.style.module.scss";
 import { Button } from "../../button/CustomButton2";
 import styled from "styled-components";

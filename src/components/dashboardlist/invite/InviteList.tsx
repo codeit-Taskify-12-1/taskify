@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import styles from "./InviteList.module.scss";
 import SearchBar from "./SearchBar";
 import None from "./none";
@@ -14,17 +14,19 @@ interface Invite {
 interface InviteDashboardListProps {
   invitations: Invite[];
   onAcceptInvite: (dashboardId: number) => void; // 대시보드 수락 후 처리 함수
+  setInvitations: Dispatch<SetStateAction<any[]>>;
 }
 
 const InviteDashboardList: React.FC<InviteDashboardListProps> = ({
   invitations,
   onAcceptInvite,
+  setInvitations,
 }) => {
   const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
-  const [updatedInvitations, setUpdatedInvitations] = useState(invitations); // 필터링된 초대 목록 상태
+  // const [updatedInvitations, setUpdatedInvitations] = useState(invitations); // 필터링된 초대 목록 상태
 
   // 검색어에 맞게 초대 목록 필터링
-  const filteredInvitations = updatedInvitations.filter((invite) =>
+  const filteredInvitations = invitations.filter((invite) =>
     invite.dashboard.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -33,7 +35,7 @@ const InviteDashboardList: React.FC<InviteDashboardListProps> = ({
     try {
       await acceptInvite(invitationId); // 초대 수락 API 호출
 
-      setUpdatedInvitations(
+      setInvitations(
         (prevInvitations) =>
           prevInvitations.filter((invite) => invite.id !== invitationId) // 수락한 초대 목록에서 제거
       );
@@ -49,7 +51,7 @@ const InviteDashboardList: React.FC<InviteDashboardListProps> = ({
     try {
       await rejectInvite(invitationId); // 초대 거절 API 호출
 
-      setUpdatedInvitations(
+      setInvitations(
         (prevInvitations) =>
           prevInvitations.filter((invite) => invite.id !== invitationId) // 거절한 초대 목록에서 제거
       );
@@ -60,7 +62,7 @@ const InviteDashboardList: React.FC<InviteDashboardListProps> = ({
 
   return (
     <div style={{ width: "90%" }}>
-      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />{" "}
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {/* 검색바 컴포넌트 */}
       <div className={styles.inviteTable}>
         <div className={styles.inviteHeader}>

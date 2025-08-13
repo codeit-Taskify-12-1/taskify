@@ -10,18 +10,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; //제일 상단에 늘 고정
+  z-index: 9999; 
 }
 
 .modalContent {
   background-color: $white;
-  width: 368px;
-  max-height: 90vh;
-  padding-top: 32px; // padding 위, 아래는 고정
-  padding-bottom: 32px;
-  padding-left: 32px; // padding 좌,우는 버튼 개수에 따라 유동적으로 조정
-  padding-right: 32px;
+  min-width: 368px;
+
+  padding: 24px;
   border-radius: 16px;
-  position: relative;
-  overflow-y: hidden;
+  
 }

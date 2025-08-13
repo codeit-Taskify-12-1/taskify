@@ -1,39 +1,45 @@
 @use "/styles/color.scss" as *;
 
-.global {
-  background-color: $gray1;
+.contents {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
-
+.content {
+  margin-left: 300px;
+  padding: 20px;
+  background-color: $gray1;
+  flex-grow: 1;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease-in-out;
+}
 .backButton {
-  background: none;
-  border: none;
-  color: $black2;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
+  -webkit-display: flex;
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  margin: 20px 0 34px;
+  cursor: pointer;
+
+  svg {
+    margin-top: -3px;
+    margin-right: 10px;
+  }
 }
 
 .profileSettings {
-  margin-top: 20px;
-  margin-left: 320px;
+  width: calc(100vw * 375 / 1200);
+  min-width: 600px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 50px);
 
-  .profileCard {
-    width: 672px;
-    height: 366px;
-  }
-
-  .passwordCard {
-    width: 672px;
-    height: 466px;
+  @media (max-width: 1300px) {
+    width: 100%;
+    min-width: 100%;
   }
 
   .profileCard,
   .passwordCard {
     background: $white;
-    padding: 20px;
+    padding: 32px 28px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -45,16 +51,16 @@
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 10px;
-      margin-left: 5px;
       color: $black2;
     }
 
     .profileInfo {
       display: flex;
       flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 42px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
 
       .avatarUpload {
         width: 182px;
@@ -68,6 +74,11 @@
         color: $gray5;
         cursor: pointer;
         position: relative;
+
+        @media (max-width: 768px) {
+          width: 120px;
+          height: 120px;
+        }
 
         input {
           position: absolute;
@@ -88,36 +99,41 @@
       .profileInputs {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        justify-content: space-between;
         gap: 16px;
+        flex: 1;
+        margin-left: 40px;
+
+        @media (max-width: 768px) {
+          margin-left: 0;
+          margin-top: 40px;
+        }
       }
     }
   }
 
   .profileInputGroup {
     input {
-      width: 400px;
+      width: 100%;
       height: 50px;
     }
   }
 
   .passwordInputGroup {
     input {
-      width: 624px;
       height: 50px;
     }
   }
 
   .profileInputGroup,
   .passwordInputGroup {
-    margin-left: 8px;
-    width: 400px;
     display: flex;
     flex-direction: column;
+    width: 100%;
 
     label {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 400;
       color: $black2;
       margin-bottom: 5px;
     }
@@ -129,17 +145,22 @@
       color: $black1;
       padding-left: 16px;
     }
+
+    input[type="email"] {
+      background: $white;
+      color: $gray4;
+    }
   }
 
   .saveButton {
-    width: 400px;
+    width: 100%;
     height: 54px;
   }
 
   .changeButton {
-    width: 624px;
+    width: 100%;
     height: 54px;
-    margin-top: 30px;
+    margin-top: 20px;
   }
 
   .saveButton,
@@ -155,6 +176,11 @@
   }
 }
 
+.saveButton:disabled {
+  cursor: auto;
+  background: #9fa6b2;
+}
+
 .passwordInputGroup {
   position: relative;
   width: 100%;
@@ -164,11 +190,74 @@
   border-color: red !important;
 }
 
+.confirmpasswordinput {
+  position: relative;
+}
+
 .errorText {
   position: absolute;
-  bottom: -17px;
-  left: 0;
+  bottom: -25px;
+  left: 10px;
   width: 100%;
   color: red;
   font-size: 12px;
+}
+
+@media (max-width: 1199px) and (min-width: 768px) {
+  .content {
+    margin-left: 160px;
+    padding: 20px;
+    background-color: $gray1;
+  }
+}
+
+@media (max-width: 767px) {
+  .content {
+    margin-left: 60px;
+    padding: 20px;
+    background-color: $gray1;
+  }
+}
+
+.customButton {
+  display: flex;
+  justify-content: center;
+  background-color: $violet2 !important;
+}
+
+.modalStyle p {
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.removeButton {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 0, 0, 0.8);
+  }
 }

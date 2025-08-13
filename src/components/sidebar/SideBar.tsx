@@ -5,24 +5,28 @@ import Image from "next/image";
 import Link from "next/link";
 import CustomModal from "../modal/CustomModal";
 import CreateBoard from "../dashboardlist/createDashboard/createDashboard";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "@/src/api/axios";
 import { Dashboard } from "@/src/types/dashboard";
+import Pagination from "../pagination/Pagination";
 
+interface DashboardListProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 export default function SideBar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dashboards, setDashboards] = useState<Dashboard[]>([]);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(60);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [size, setSize] = useState(20);
+  const [total, setTotal] = useState(0);
 
-  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  const [isMobile, setIsMobile] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,51 +41,25 @@ export default function SideBar() {
     };
   }, []);
 
-  const fetchDashboards = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
+  useEffect(() => {
+    const test = async () => {
       const res = await axiosInstance.get("/dashboards", {
-        params: { navigationMethod: "infiniteScroll", page, size },
+        params: { navigationMethod: "pagination", page, size },
       });
-      setDashboards((prev) => [...prev, ...res.data.dashboards]);
-      setHasMore(
-        res.data.totalCount > dashboards.length + res.data.dashboards.length
-      );
-      setPage((prev) => prev + 1);
-    } catch (error) {
-      console.error("대시보드 불러오기 에러:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboards();
-  }, []);
-
-  useEffect(() => {
-    if (loading || !hasMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchDashboards();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
+      setDashboards(res.data.dashboards);
+      setTotal(res.data.totalCount);
     };
-  }, [loading, hasMore]);
+    test();
+  }, [page, size]);
+
+  const handleDashboardCreate = (newDashboard: Dashboard) => {
+    setDashboards((prev) => [newDashboard, ...prev].slice(0, size));
+    setTotal((prev) => prev + 1);
+    closeModal();
+    //react.qurey로 상태 관리하기
+
+    window.location.reload();
+  };
 
   return (
     <div className={styles.sidebar}>
@@ -114,11 +92,18 @@ export default function SideBar() {
               <CustomModal isOpen={isModalOpen} onClose={closeModal}>
                 <CreateBoard
                   onClose={closeModal}
-                  dashboardName={""}
-                  setDashboardName={() => {}}
+                  onDashboardCreate={handleDashboardCreate}
+                  dashboardName={dashboards}
+                  setDashboardName={function (name: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
                   selectedColor={""}
-                  setSelectedColor={() => {}}
-                  handleCreate={() => Promise.resolve()}
+                  setSelectedColor={function (color: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  handleCreate={function (): Promise<void> {
+                    throw new Error("Function not implemented.");
+                  }}
                 />
               </CustomModal>
             )}
@@ -149,11 +134,13 @@ export default function SideBar() {
               </div>
             </Link>
           ))}
+          <Pagination
+            currentPage={page}
+            totalPages={Math.floor(total / size)}
+            onPageChange={setPage}
+          />
+          <div style={{ height: "20px", background: "transparent" }}></div>
         </div>
-
-        <div ref={observerRef} style={{ height: "20px" }} />
-        {loading && <p>로딩 중...</p>}
-        {!hasMore && !loading && <p>더 이상 대시보드가 없습니다.</p>}
       </div>
     </div>
   );

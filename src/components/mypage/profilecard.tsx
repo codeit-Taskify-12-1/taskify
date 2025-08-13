@@ -1,80 +1,143 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router"; 
+import React, { ChangeEvent, useEffect, useState } from "react";
+
 import styles from "@/pages/mypage/mypage.module.scss";
 import AvatarUploader from "./avataruploader";
-import { updateProfile } from "@/src/api/userApi"; 
+import { updateProfile } from "@/src/api/userApi";
+import axiosInstance from "@/src/api/axios";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { CheckModal } from "../dashboard/edit/modal/Check";
 
 interface ProfileCardProps {
-  email: string; 
-  nickname: string;
-  setNickname: (nickname: string) => void;
-  profileImage: string | null;
-  setProfileImage: (image: string | null) => void;
+  email: string;
+  recentNickname: string;
+  recentProfileImg: string | StaticImport | null;
 }
 
 export default function ProfileCard({
   email,
-  nickname,
-  setNickname,
-  profileImage,
-  setProfileImage,
+  recentNickname,
+  recentProfileImg,
 }: ProfileCardProps) {
-  const router = useRouter(); // router 선언 추가
-  const [loading, setLoading] = useState(false); // 로딩 상태 관리
-  const [error, setError] = useState<string | null>(null); // 오류 상태 관리
+  const [isModal, setIsModal] = useState<boolean>(false);
+  const isMessage = "변경이 완료 되었습니다.";
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [reqImage, setReqImage] = useState<File | null | undefined>();
+  const [isProfileImage, setIsProfileImage] = useState();
+  const [isNicknameValue, setIsNicknameValue] = useState(recentNickname);
+  const [isThumbnail, setIsThumbnail] = useState(recentProfileImg);
+  const [isDisabled, setIsDisabled] = useState(true);
 
-  // handleSave 함수에 async 추가
-  const handleSave = async () => { 
-    setLoading(true);
-    setError(null);
-
-    try {
-      await updateProfile( nickname, profileImage );
-      console.log("프로필 저장 완료", { nickname, profileImage });
-      alert("프로필이 업데이트되었습니다!");
-      router.push("/mypage"); // 성공 시 마이페이지로 이동
-    } catch (err) {
-      setError("프로필 업데이트에 실패했습니다.");
-      console.error("프로필 업데이트 오류:", err);
-    } finally {
-      setLoading(false);
-    }
+  const handleNicknameInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsNicknameValue(e.target.value);
   };
 
+  const handleSave = async () => {
+    setLoading(true);
+    setIsModal(true);
+
+    if (reqImage !== undefined) {
+      try {
+        const response = await axiosInstance.post(
+          "/users/me/image",
+          {
+            image: reqImage,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const { data } = response;
+        setIsProfileImage(data.profileImageUrl);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setIsUpdate(true);
+  };
+
+  useEffect(() => {
+    if (isUpdate) {
+      try {
+        updateProfile(isNicknameValue, isProfileImage);
+        console.log("프로필 저장 완료", {
+          isNicknameValue,
+          profileImage: isProfileImage,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsUpdate(false);
+        setIsDisabled(true);
+        setLoading(false);
+      }
+    }
+  }, [isUpdate]);
+
+  useEffect(() => {
+    if (
+      (recentNickname === isNicknameValue &&
+        recentProfileImg === isThumbnail) ||
+      isNicknameValue === "" ||
+      isThumbnail === ""
+    ) {
+      setIsDisabled(true);
+    } else if (
+      (recentNickname !== isNicknameValue &&
+        recentProfileImg !== isThumbnail) ||
+      recentNickname !== isNicknameValue ||
+      recentProfileImg !== isThumbnail
+    ) {
+      setIsDisabled(false);
+    }
+  }, [isNicknameValue, isThumbnail]);
+
   return (
-    <div className={styles.profileCard}>
-      <h2>프로필</h2>
-      <div className={styles.profileInfo}>
-        <AvatarUploader
-          profileImage={profileImage}
-          setProfileImage={setProfileImage}
+    <>
+      {isModal && (
+        <CheckModal
+          isModal={isModal}
+          setIsModal={setIsModal}
+          isMessage={isMessage}
         />
+      )}
+      <div className={styles.profileCard}>
+        <h2>프로필</h2>
+        <div className={styles.profileInfo}>
+          <AvatarUploader
+            setReqImage={setReqImage}
+            isThumbnail={isThumbnail}
+            setIsThumbnail={setIsThumbnail}
+          />
+          <div className={styles.profileInputs}>
+            <div className={styles.profileInputGroup}>
+              <label>이메일</label>
+              <input type="email" value={email} disabled />
+            </div>
 
-        <div className={styles.profileInputs}>
-          <div className={styles.profileInputGroup}>
-            <label>이메일</label>
-            <input type="email" value={email} disabled />
-          </div>
-
-          <div className={styles.profileInputGroup}>
-            <label>닉네임</label>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-            />
+            <div className={styles.profileInputGroup}>
+              <label>닉네임</label>
+              <input
+                type="text"
+                defaultValue={recentNickname}
+                onChange={(e) => {
+                  handleNicknameInput(e);
+                }}
+              />
+            </div>
           </div>
         </div>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={isDisabled}
+        >
+          {loading ? "저장 중" : "저장"}
+        </button>
       </div>
-      <button
-        onClick={handleSave} // 클릭 시 handleSave 실행
-        className={styles.saveButton}
-        disabled={loading}
-      >
-        {loading ? "저장 중" : "저장"}
-      </button>
-
-      {error && <p className={styles.error}>{error}</p>}
-    </div>
+    </>
   );
 }

@@ -1,0 +1,13 @@
+/* components/MemberProfile.module.scss */
+
+.memberCircle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

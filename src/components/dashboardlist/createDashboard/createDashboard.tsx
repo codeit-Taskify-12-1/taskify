@@ -1,28 +1,25 @@
+import { useState } from "react";
 import { Dashboard } from "@/src/types/dashboard";
 import styles from "./createDashboard.module.scss";
-import { useCreateBoard } from "@/src/hooks/useCreateBoard";
+import axiosInstance from "@/src/api/axios";
 import Image from "next/image";
 
 interface CreateBoardProps {
-  dashboardName: string;
+  onClose: () => void;
+  onDashboardCreate: (newDashboard: Dashboard) => void;
+  dashboardName: Dashboard[]; 
   setDashboardName: (name: string) => void;
   selectedColor: string;
   setSelectedColor: (color: string) => void;
   handleCreate: () => Promise<void>;
-  onClose: () => void;
-  onDashboardCreate?: (newDashboard: Dashboard) => void;
 }
+
 export default function CreateBoard({
   onClose,
   onDashboardCreate,
 }: CreateBoardProps) {
-  const {
-    dashboardName,
-    setDashboardName,
-    selectedColor,
-    setSelectedColor,
-    handleCreate,
-  } = useCreateBoard(onClose, onDashboardCreate);
+  const [dashboardName, setDashboardName] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
 
   const colors = [
     { code: "#7ac555", className: styles.colorGreen },
@@ -31,6 +28,42 @@ export default function CreateBoard({
     { code: "#76a5ea", className: styles.colorBlue },
     { code: "#e876ea", className: styles.colorPink },
   ];
+
+  const handleCreate = async () => {
+    if (!dashboardName.trim()) {
+      alert("대시보드 이름을 입력해주세요.");
+      return;
+    }
+
+    if (!selectedColor) {
+      alert("색상을 선택해주세요.");
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/dashboards",
+        { title: dashboardName, color: selectedColor },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        onDashboardCreate?.(response.data);
+        setDashboardName("");
+        setSelectedColor("");
+        onClose();
+      } else {
+        console.error("Unexpected response status:", response.status);
+      }
+    } catch (error: any) {
+      console.error("Axios Error:", error.response?.data || error.message);
+      
+    }
+  };
 
   return (
     <div className={styles.modalContent}>

@@ -12,10 +12,12 @@ import CustomModal from "@/src/components/modal/CustomModal";
 import loginStyles from "./modal.module.scss";
 import CustomButton from "@/src/components/button/CustomButton";
 import buttonStyles from "./button.module.scss";
-import  useDevice  from '@/src/hooks/useDevice';
+
+import axios from "axios"; 
+
 
 export default function LoginPage() {
-  const device = useDevice();
+
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -28,23 +30,20 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  // 유저가 입력한 값의 상태 저장
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
 
     setValues((prevValues) => {
       const newValues = { ...prevValues, [name]: value };
 
-      // 이메일 형식 검증 함수
       const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
       };
 
-      // 이메일 형식 실시간 검증
       if (name === "email") {
         if (value === "") {
-          setEmailErrorMessage(""); // 이메일이 빈 값이면 에러 메시지 초기화
+          setEmailErrorMessage("");
         } else if (!validateEmail(value)) {
           setEmailErrorMessage("이메일 형식으로 입력해주세요");
         } else {
@@ -62,7 +61,6 @@ export default function LoginPage() {
         }
       }
 
-      //로그인 버튼 비활성화/활성화화
       setIsButtonDisabled(
         !(validateEmail(newValues.email) && newValues.password.length >= 8)
       );
@@ -76,25 +74,36 @@ export default function LoginPage() {
 
     const { email, password } = values;
 
-    // axios 리퀘스트 보내기
-
     try {
       const response = await axiosinstance.post("/auth/login", {
         email,
         password,
       });
-      console.log("로그인 성공", response.data);
+    
       const { accessToken } = response.data;
+    
+      if (!accessToken) {
+        console.error("🚨 서버에서 accessToken을 받지 못했습니다.");
+        setIsModalOpen(true);
+        return;
+      }
+    
+      // ✅ 토큰 저장 후 약간의 딜레이를 준 후 페이지 이동
       sessionStorage.setItem("accessToken", accessToken);
       setTimeout(() => {
         router.push("/dashboard");
-      }, 0);
-    } catch (error: any) {
-      console.error("로그인 실패:", error.response?.data || error.message);
+      }, 100); // 🔹 100ms 딜레이 추가
+    
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("로그인 실패:", error.response?.data || error.message);
+      } else {
+        console.error("알 수 없는 오류 발생:", error);
+      }
       setIsModalOpen(true);
     }
   }
-
+    
   function handleSignupClick() {
     router.push("/signup");
   }
@@ -164,7 +173,6 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* 로그인버튼 */}
         <button
           className={`${style.loginbutton} ${
             !isButtonDisabled ? style.buttonActivated : ""
@@ -174,7 +182,6 @@ export default function LoginPage() {
           로그인
         </button>
 
-        {/* 회원가입페이지로이동버튼 */}
         <p className={style.signuptext}>
           회원이 아니신가요?{" "}
           <span className={style.signuptextbutton} onClick={handleSignupClick}>
@@ -183,10 +190,8 @@ export default function LoginPage() {
         </p>
       </form>
 
-      {/* 모달 컴포넌트 */}
-      <CustomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} width="368">
+      <CustomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className={loginStyles.modalOverlay}>
-          {/* <div className={loginStyles.modalContent}> */}
           <div className={loginStyles.contentstyle}>
             <div className={loginStyles.textandbutton}>
               <p className={loginStyles.tag}>비밀번호가 일치하지 않습니다.</p>

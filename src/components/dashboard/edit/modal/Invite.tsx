@@ -10,7 +10,7 @@ import {
   Label,
   ModalHead,
   ModalTitle,
-} from "./style";
+} from "./Style";
 import { ChangeEvent } from "react";
 
 export function InviteModal({
@@ -45,45 +45,48 @@ export function InviteModal({
 
   return (
     <CustomModal isOpen={isModal} onClose={closeModal}>
-      <ModalHead>
-        <ModalTitle>초대하기</ModalTitle>
-        <CloseButton>
-          <Close onClick={closeModal} />
-        </CloseButton>
-      </ModalHead>
-      <form
-        onChange={enterChangeUpdate}
-        onSubmit={(e) => {
-          e.preventDefault();
-          postInvitation?.();
-          setUpdateInvite?.(true);
-          setIsValue("");
-        }}
-      >
-        <InputContainer>
-          <Label>이메일</Label>
-          <Input
-            placeholder="이메일을 입력해주세요"
-            onChange={(e) => handleChangeValue(e)}
-          />
-          <InputMessage>{isErrorMessage}</InputMessage>
-        </InputContainer>
-        <ButtonContainer>
-          <Button onClick={closeModal}>취소</Button>
-          <Button
-            disabled={isValue === "" ? true : false}
-            $confirm
-            onClick={() => {
-              setIsUpdate(false);
-              postInvitation?.();
-              setUpdateInvite?.(true);
-              setIsValue("");
-            }}
-          >
-            생성
-          </Button>
-        </ButtonContainer>
-      </form>
+      {/* width값 설정 추가 - 나겸 */}
+      <div style={{ width: "568px" }}>
+        <ModalHead>
+          <ModalTitle>초대하기</ModalTitle>
+          <CloseButton>
+            <Close onClick={closeModal} />
+          </CloseButton>
+        </ModalHead>
+        <form
+          onChange={enterChangeUpdate}
+          onSubmit={(e) => {
+            e.preventDefault();
+            postInvitation?.();
+            setUpdateInvite?.(true);
+            setIsValue("");
+          }}
+        >
+          <InputContainer>
+            <Label>이메일</Label>
+            <Input
+              placeholder="이메일을 입력해주세요"
+              onChange={(e) => handleChangeValue(e)}
+            />
+            <InputMessage>{isErrorMessage}</InputMessage>
+          </InputContainer>
+          <ButtonContainer>
+            <Button onClick={closeModal}>취소</Button>
+            <Button
+              disabled={isValue === "" ? true : false}
+              $confirm
+              onClick={() => {
+                setIsUpdate(false);
+                postInvitation?.();
+                setUpdateInvite?.(true);
+                setIsValue("");
+              }}
+            >
+              생성
+            </Button>
+          </ButtonContainer>
+        </form>
+      </div>
     </CustomModal>
   );
 }

@@ -42,6 +42,7 @@ export const Button = styled.div<Props>`
 
 // CheckModal
 export const Contents = styled.div`
+  width: 568px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

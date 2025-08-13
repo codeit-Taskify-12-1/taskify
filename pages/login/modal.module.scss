@@ -14,6 +14,7 @@
 
 .modalContent{
   width: 368px!important;
+  
 }
 /* ✅ 모달 컨텐츠: 항상 오버레이 위에 뜨도록 설정 */
 .contentstyle {
@@ -30,6 +31,12 @@
   justify-content: center;
   align-items: center;
   z-index: 1000; /* ✅ 오버레이보다 높은 값으로 설정 */
+  transform: translate(-50%, -50%);
+    
+  /* 🔹 중앙 정렬을 위한 absolute + top, left 설정 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 
 .textandbutton{
@@ -47,3 +54,81 @@
 //   font-size: 17px;
 
 // }
+
+@media (max-width: 375px) {
+  .modalOverlay {
+    position: fixed; /* 화면 고정 (스크롤 내려도 따라다님) */
+    top: 0;
+    left: 0;
+    width: 565px; /* 화면 전체 너비 */
+    height: 1000px; /* 화면 전체 높이 */
+    background-color: rgba(0, 0, 0, 0.5); /* ✅ 배경을 어둡게 (투명도 50%) */
+    display: flex; /* ✅ Flexbox 사용 */
+    justify-content: center; /* ✅ 가로 중앙 정렬 */
+    align-items: center; /* ✅ 세로 중앙 정렬 */
+    z-index: 999; /* ✅ 모달보다 한 단계 낮은 z-index 설정 */
+    
+  }
+
+}
+@media (min-width: 376px) and (max-width: 1024px){
+  .modalOverlay {
+    position: fixed; /* 화면 고정 (스크롤 내려도 따라다님) */
+    top: 0;
+    left: 0;
+    width: 100vw; /* 화면 전체 너비 */
+    height: 100vh; /* 화면 전체 높이 */
+    background-color: rgba(0, 0, 0, 0.5); /* ✅ 배경을 어둡게 (투명도 50%) */
+    display: flex; /* ✅ Flexbox 사용 */
+    justify-content: center; /* ✅ 가로 중앙 정렬 */
+    align-items: center; /* ✅ 세로 중앙 정렬 */
+    z-index: 999; /* ✅ 모달보다 한 단계 낮은 z-index 설정 */
+  }
+  
+  .modalContent{
+    width: 368px!important;
+    transform: translate(-50%, -50%);
+    
+    /* 🔹 중앙 정렬을 위한 absolute + top, left 설정 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+  }
+  /* ✅ 모달 컨텐츠: 항상 오버레이 위에 뜨도록 설정 */
+  .contentstyle {
+    position: relative; /* ✅ z-index 적용을 위해 relative 추가 */
+    background-color: white; /* ✅ 모달 배경을 흰색으로 */
+    padding-top: 32px; // padding 위, 아래는 고정
+    padding-bottom: 32px;
+    padding-left: 32px; // padding 좌,우는 버튼 개수에 따라 유동적으로 조정
+    padding-right: 32px;
+    border-radius: 16px;
+    width: 368px; /* ✅ 모달 크기 */
+    height: 192px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* ✅ 오버레이보다 높은 값으로 설정 */
+    transform: translate(-50%, -50%);
+    
+    /* 🔹 중앙 정렬을 위한 absolute + top, left 설정 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  
+  }
+  
+  .textandbutton{
+    width: 240px;
+    height: 112px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    transform: scale(1.2);
+  
+  }
+  
+}
