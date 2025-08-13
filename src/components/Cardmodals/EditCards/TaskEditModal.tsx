@@ -20,8 +20,8 @@ interface Task {
   description: string;
   tags: string[];
   dueDate: string | null;
-  assigneeUserId: number | null; // 수정된 부분
-  columnId: number | null; // 수정된 부분
+  assigneeUserId: number | null;
+  columnId: number | null;
   imageUrl: string | null;
 }
 
@@ -72,7 +72,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
   const [tags, setTags] = useState<string[]>(task.tags || []);
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(task.imageUrl);
-  const [assigneeListState, setAssigneeListState] = useState<Assignee[]>([]); // ✅ useState에 저장할 변수
+  const [assigneeListState, setAssigneeListState] = useState<Assignee[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -87,25 +87,23 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           }
         }
       } catch (error) {
-        console.error("❌ 컬럼 목록 조회 실패:", error);
+        console.error("컬럼 목록 조회 실패:", error);
       }
     };
 
     const fetchAssignees = async () => {
       try {
-        console.log("🟢 현재 dashboardId:", dashboardId); // ✅ dashboardId 확인
+        console.log("현재 dashboardId:", dashboardId);
 
         if (!dashboardId || isNaN(Number(dashboardId))) {
-          console.error("❌ 잘못된 dashboardId:", dashboardId);
+          console.error("잘못된 dashboardId:", dashboardId);
           return;
         }
 
-        const data = await getMembers(dashboardId); // ✅ getMembers 호출
-        console.log("🟢 getMembers 응답:", data);
-
+        const data = await getMembers(dashboardId);
         if (!Array.isArray(data.members)) {
           console.warn("API 응답에 members 키가 없음. 빈 배열 사용.");
-          setAssigneeList([]); // ✅ members가 없을 경우 안전하게 빈 배열 설정
+          setAssigneeList([]);
           return;
         }
 
@@ -116,7 +114,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           profileImageUrl: member.profileImageUrl || null,
         }));
 
-        console.log("🟢 변환된 담당자 리스트:", mappedAssignees);
         setAssigneeList(mappedAssignees);
 
         setFormData((prev) => ({
@@ -127,7 +124,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           imageUrl: prev.imageUrl ?? null,
         }));
       } catch (error) {
-        console.error("❌ getMembers API 호출 실패:", error);
+        console.error("getMembers API 호출 실패:", error);
       }
     };
 
@@ -163,8 +160,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
         imageUrl: imageUrl ? imageUrl.trim() : null,
       };
 
-      console.log("📌 최종 업데이트 요청 데이터:", updatedData);
-
       await updateCard(task.id, updatedData);
       await fetchCards();
 
@@ -174,7 +169,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
         onClose();
       }, 100);
     } catch (error) {
-      console.error("❌ 카드 업데이트 중 에러 발생:", error);
+      console.error("카드 업데이트 중 에러 발생:", error);
     }
   };
 
@@ -190,21 +185,39 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
     }
   };
 
-  if (!isOpen || !task) return null;
-
   useEffect(() => {
+    if (!isOpen || !task) return;
     if (assigneeList.length > 0) {
       setAssigneeListState(assigneeList);
     }
-  }, [assigneeList]);
+  }, [isOpen, task, assigneeList]);
 
-  console.log("🔍 TaskEditModal에서 전달하는 assigneeList:", assigneeListState);
+  // 태그가 변경될 때마다 formData도 업데이트
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: [...tags],
+    }));
+  }, [tags]);
+
+  // 수정 버튼 활성화 조건 체크
+  const isFormValid = () => {
+    return (
+      formData.title.trim() !== "" &&
+      formData.description.trim() !== "" &&
+      formData.columnId !== null &&
+      formData.dueDate !== null &&
+      tags.length > 0
+    );
+  };
+
+  if (!isOpen || !task) return null;
 
   return (
     <CustomTaskEditModal
       isOpen={isOpen}
       onClose={onClose}
-      width="auto"
+      width=""
       height="auto"
       className={styles.customTaskEditModal}
     >
@@ -274,7 +287,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({
           <button onClick={onClose} className={styles.cancelButton}>
             취소
           </button>
-          <button onClick={handleSave} className={styles.saveButton}>
+          <button 
+            onClick={handleSave} 
+            className={styles.saveButton}
+            disabled={!isFormValid()}
+          >
             수정
           </button>
         </div>

@@ -1,11 +1,16 @@
 .customTaskEditModal {
-  width: 584px;
-  max-width: 90vw;
+  width: 750px;
   height: auto;
   display: flex;
   flex-direction: column;
   overflow-y: visible;
   padding: 24px;
+
+  @media (max-width: 768px) {
+    width: 450px;
+    max-height: 80vh;
+    padding: 20px;
+  }
 }
 
 .taskEditTitle {
@@ -16,6 +21,11 @@
   letter-spacing: 0%;
   color: #333236;
   margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 }
 
 .statusLabel,
@@ -45,6 +55,10 @@
   .formGroup {
     margin-bottom: 32px;
     display: block;
+
+    @media (max-width: 768px) {
+      margin-bottom: 20px;
+    }
   }
 
   .formGroup:last-child {
@@ -58,6 +72,10 @@
     margin-top: 32px;
     flex-wrap: nowrap;
     gap: 8px;
+
+    @media (max-width: 768px) {
+      margin-top: 20px;
+    }
   }
 }
 
@@ -74,6 +92,10 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+  }
 }
 
 .statusBox,
@@ -98,6 +120,10 @@
   margin-top: 32px;
   flex-wrap: nowrap;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+  }
 }
 
 .cancelButton,
@@ -123,6 +149,12 @@
   color: #ffffff;
   background-color: #5534da;
   border: none;
+  
+  &:disabled {
+    background-color: #d1d5db;
+    color: #787486;
+    cursor: not-allowed;
+  }
 }
 @media (max-width: 768px) {
   .customTaskEditModal {

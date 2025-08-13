@@ -10,7 +10,6 @@ import TaskCommentInput from "./TaskCommentInput";
 import { getCardDetail } from "@/src/api/cards";
 import { getComments } from "@/src/api/comments";
 import styles from "./TaskCardModal.module.scss";
-import TaskEditModal from "../EditCards/TaskEditModal";
 
 interface TaskCardModalProps {
   isOpen: boolean;
@@ -25,6 +24,7 @@ interface TaskCardModalProps {
 const TaskCardModal: React.FC<TaskCardModalProps> = ({
   isOpen,
   onClose,
+  onOpenEditModal,
   cardId,
   columnTitle,
   columnId,
@@ -32,7 +32,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 }) => {
   const [cardData, setCardData] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -44,6 +43,8 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
       fetchComments();
     } else {
       document.body.style.overflow = "";
+      setComments([]);
+      setCardData(null);
     }
 
     return () => {
@@ -53,7 +54,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 
   const fetchComments = async () => {
     try {
-      const response = await getComments(cardId, 10, null);
+      const response = await getComments(cardId, 10000, null);
       if (response && response.comments) {
         setComments(response.comments);
       }
@@ -63,13 +64,10 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
   };
 
   const handleOpenEditModal = () => {
-    console.log("수정 모달 열기 시도!");
-    setIsEditModalOpen(true);
+    onOpenEditModal();
   };
 
-  // ✅ cardData 변경될 때 컬럼 최신화 적용
   useEffect(() => {
-    console.log("🔄 TaskCardModal에서 최신 cardData 반영됨:", cardData);
   }, [cardData]);
 
   return (
@@ -89,6 +87,19 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
             <h2 className={styles.title}>{cardData?.title || "제목 없음"}</h2>
           </div>
 
+          {/* 모바일용 담당자/마감일 섹션 */}
+          <div className={styles.mobileAssigneeSection}>
+            <TaskAssignee
+              assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
+              dueDate={cardData?.dueDate ?? "마감일 없음"}
+            />
+          </div>
+
+          {/* 모바일용 태그 섹션 */}
+          <div className={styles.mobileTagsSection}>
+            <TaskTags tags={cardData?.tags || []} />
+          </div>
+
           <div className={styles.columnAndTagsContainer}>
             <TaskColumn columnTitle={columnTitle} />
             <div className={styles.verticalDivider} />
@@ -103,10 +114,15 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
               <TaskImage imageUrl={cardData?.imageUrl} />
             </div>
 
-            <TaskAssignee
-              assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
-              dueDate={cardData?.dueDate ?? "마감일 없음"}
-            />
+            <div className={styles.rightContent}>
+              {/* PC/태블릿용 담당자/마감일 - 모바일에서는 숨김 */}
+              <div className={styles.desktopAssigneeSection}>
+                <TaskAssignee
+                  assignee={cardData?.assignee ?? { nickname: "담당자 없음" }}
+                  dueDate={cardData?.dueDate ?? "마감일 없음"}
+                />
+              </div>
+            </div>
           </div>
 
           <div className={styles.commentSection}>
@@ -118,6 +134,7 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
               setComments={setComments}
             />
             <TaskComments
+              key={cardId} // cardId가 변경될 때마다 새로운 컴포넌트 인스턴스
               cardId={cardId}
               comments={comments}
               setComments={setComments}
@@ -126,18 +143,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
           </div>
         </div>
       </CustomModal>
-      {isEditModalOpen && (
-        <TaskEditModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          task={cardData}
-          fetchCards={fetchComments}
-          dashboardId={dashboardId}
-          updateTaskDetails={(updatedTask) => {
-            setCardData(updatedTask);
-          }}
-        />
-      )}
     </>
   );
 };

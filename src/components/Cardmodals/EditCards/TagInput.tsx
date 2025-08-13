@@ -32,7 +32,7 @@ const TagInput: React.FC<TagInputProps> = ({ tags, setTags }) => {
         <TaskTags tags={tags} />
         <input
           type="text"
-          placeholder="입력 후 Enter"
+          placeholder={tags.length > 0 ? "" : "입력 후 Enter"}
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}
           onKeyDown={handleTagKeyPress}
